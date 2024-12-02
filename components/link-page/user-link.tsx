@@ -271,7 +271,7 @@ export default function UserLink({ pseudo }: Props) {
 
                               </div>
                               <div className='w-8 flex flex-col gap-3  items-end justify-end'>
-                              {block.isPrivate && <Lock className="w-3 h-3 mr-0.5 text-red-500" />}
+                              {block.isPrivate && !userInfo?.email && <Lock className="w-3 h-3 mr-0.5 text-red-500" />}
                                 <ExternalLink className="w-4 h-4 " />
                               </div>
                             </button>
