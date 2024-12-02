@@ -51,7 +51,7 @@ export function LoginForm() {
   const { isPending, mutateAsync } = useServerActionMutation(handleLoginAction, {
     onSuccess(res) {
       if (res?.success === true) {
-        router.push('/auth/login')
+        router.push('/dashboard')
         form.reset();
         // queryClient.invalidateQueries({ queryKey: ['depots'] });
       } else {

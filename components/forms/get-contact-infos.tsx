@@ -1,6 +1,6 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client"
 
+import { useState, useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -16,11 +16,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useServerActionMutation } from '@/lib/zsa.query'
-import { Loader2 } from "lucide-react"
+import { Loader2 } from 'lucide-react'
 import { contactInfoSchema } from "@/src/shemas/get-contact-info-shema"
 import { saveContactInfosAction } from "@/actions/contact-action"
 import { useParams } from "next/navigation"
-
 
 type GetContactInfosProps = {
   isModalOpen: boolean
@@ -29,20 +28,42 @@ type GetContactInfosProps = {
 }
 
 export const GetUserInfos: React.FC<GetContactInfosProps> = ({ isModalOpen, setIsModalOpen, currentLink }) => {
-const params = useParams()
-console.log(params.pseudo)
+  const params = useParams()
+  const [userInfo, setUserInfo] = useState<z.infer<typeof contactInfoSchema> | null>(null)
+
+  useEffect(() => {
+    const storedInfo = localStorage.getItem('userInfo')
+    if (storedInfo) {
+      setUserInfo(JSON.parse(storedInfo))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (userInfo) {
+      window.open(currentLink, '_blank')
+      setIsModalOpen(false)
+    }
+  }, [userInfo, currentLink, setIsModalOpen])
+
   const form = useForm<z.infer<typeof contactInfoSchema>>({
     resolver: zodResolver(contactInfoSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      pseudo:params.pseudo as string ?? ""
+      name: userInfo?.name || "",
+      email: userInfo?.email || "",
+      pseudo: params.pseudo as string ?? ""
     },
   })
 
   const { isPending, mutateAsync } = useServerActionMutation(saveContactInfosAction, {
     onSuccess(res) {
       if (res?.success === true) {
+        const newUserInfo = {
+          name: form.getValues('name'),
+          email: form.getValues('email'),
+          pseudo: params.pseudo as string
+        }
+        localStorage.setItem('userInfo', JSON.stringify(newUserInfo))
+        setUserInfo(newUserInfo)
         window.open(currentLink, '_blank')
         form.reset()
         setIsModalOpen(false)
@@ -52,13 +73,31 @@ console.log(params.pseudo)
     },
   })
 
-  function handleSubmit(values: z.infer<typeof contactInfoSchema>) {
-    mutateAsync(values)
+  async function handleSubmit(values: z.infer<typeof contactInfoSchema>) {
+    const ipResponse = await fetch('https://api.ipify.org?format=json')
+    const ipData = await ipResponse.json()
+    const ipAdress = ipData.ip
+
+    const geoResponse = await fetch(`https://ipapi.co/${ipAdress}/json/`)
+    const geoData = await geoResponse.json()
+
+    const enrichedValues = {
+      ...values,
+      ipAdress,
+      location: `${geoData.city}, ${geoData.region}`,
+      country: geoData.country_name
+    }
+    console.log('userinfos:',enrichedValues)
+    mutateAsync(enrichedValues)
   }
 
   const handleInteractOutside = (event: Event) => {
     event.preventDefault();
   };
+
+  if (userInfo) {
+    return null;
+  }
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

@@ -9,7 +9,7 @@ import { Prisma } from "@prisma/client";
 export const saveContactInfosAction = action
     .input(contactInfoSchema)
     .handler(async ({ input }) => {
-        const { name, email, pseudo } = input;
+        const { name, email, pseudo, ipAdress, location, country } = input;
 
         const emailLowercase = email.toLowerCase();
 
@@ -44,9 +44,12 @@ export const saveContactInfosAction = action
                 data: {
                     name: name,
                     email: emailLowercase,
-                    createdAt: new Date(),
+                    userId: existingUser.id,
+                    ipAdress: ipAdress,
+                    location: location,
+                    country: country,
                     updatedAt: undefined,
-                    userId: existingUser.id
+                    createdAt: new Date(),
                 },
             });
             console.log("Contact crée avec succés")
@@ -60,53 +63,53 @@ export const saveContactInfosAction = action
     })
 
 
-    export const getAllContactFilterAction = async (filters: FilterContactParams) => {
-        try {
-            const { search} = filters;
-    
-            const orderBy: Prisma.ContactOrderByWithRelationInput[] = [
-                { updatedAt: 'desc' },
-                { createdAt: 'desc' }
-            ];
-            // Vérifier si des filtres sont spécifiés
-            const where: Prisma.ContactWhereInput = {
-               
-       
-                ...(search && {
-                    OR: [
-                        { name:  { contains: search, mode: 'insensitive' } },
-                        { email:  { contains: search, mode: 'insensitive' } },
-                    ],
-                }),
-            };
-    
-            const [contacts, total] = await Promise.all([
-                db.contact.findMany({
-                    where,
-                  
-                    orderBy: orderBy,
-                 
-                }),
-                db.contact.count({ where }),
-            ]);
-    
-            // Transform the response
-            const response: ContactType[] = contacts.map((contact) => ({
-              id:contact.id,
-              name: contact.name,
-              email: contact.email,
-                
-            }));
-    
-            return {
-                success: true,
-                data: response,
-                total,
-                message: "contact récupérés avec succès !",
-            };
-        } catch (error) {
-            console.error("Erreur lors de la récupération des contact!", error);
-            return { success: false, message: "Erreur lors de la récupération des contact !" };
-        }
-    };
-    
+export const getAllContactFilterAction = async (filters: FilterContactParams) => {
+    try {
+        const { search } = filters;
+
+        const orderBy: Prisma.ContactOrderByWithRelationInput[] = [
+            { updatedAt: 'desc' },
+            { createdAt: 'desc' }
+        ];
+        // Vérifier si des filtres sont spécifiés
+        const where: Prisma.ContactWhereInput = {
+
+
+            ...(search && {
+                OR: [
+                    { name: { contains: search, mode: 'insensitive' } },
+                    { email: { contains: search, mode: 'insensitive' } },
+                ],
+            }),
+        };
+
+        const [contacts, total] = await Promise.all([
+            db.contact.findMany({
+                where,
+
+                orderBy: orderBy,
+
+            }),
+            db.contact.count({ where }),
+        ]);
+
+        // Transform the response
+        const response: ContactType[] = contacts.map((contact) => ({
+            id: contact.id,
+            name: contact.name,
+            email: contact.email,
+            location: contact.location ?? "",
+            country: contact.country ?? ""
+        }));
+
+        return {
+            success: true,
+            data: response,
+            total,
+            message: "contact récupérés avec succès !",
+        };
+    } catch (error) {
+        console.error("Erreur lors de la récupération des contact!", error);
+        return { success: false, message: "Erreur lors de la récupération des contact !" };
+    }
+};

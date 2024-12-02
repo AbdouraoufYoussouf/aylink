@@ -48,6 +48,20 @@ export const columns: ColumnDef<ContactType>[] = [
       <span className="text-nowrap">{row.original.email}</span>
     ),
   },
+  {
+    accessorKey: 'country',
+    header: 'Pays',
+    cell: ({ row }) => (
+      <span className="text-nowrap">{row.original.country}</span>
+    ),
+  },
+  {
+    accessorKey: 'location',
+    header: 'Location',
+    cell: ({ row }) => (
+      <span className="text-nowrap">{row.original.location}</span>
+    ),
+  },
  
 
   // Actions

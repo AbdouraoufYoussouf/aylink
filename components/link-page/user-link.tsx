@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -12,6 +12,8 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserProfilByPseudo } from '@/actions/user-action'
 import { TwitterIcon as TikTok, Youtube, PhoneIcon as Whatsapp, ExternalLink, Lock } from 'lucide-react'
 import { FaGithub, FaTiktok, FaWhatsapp, FaYoutube } from 'react-icons/fa'
+import { ContactType } from '@/src/types/contact-type'
+import UserLinkSkeleton from './link-page-skeleton'
 
 interface SubBlock {
   title: string;
@@ -28,7 +30,7 @@ interface Category {
 
 const profilData = {
   name: "Rafien",
-  description: "Développeur web et monteur vidéo passionné 🚀, je transforme vos idées en réalité, que ce soit en ligne ou à l'écran. Discutons de votre projet via WhatsApp ou email 🌟 ! Et si on parle aussi de séries, j'ai un faible pour ça!",
+  description: "💻 Développeur et créateur de contenu, je construis vos sites 🌐 et applications mobiles 📱 et vous accompagne pour lancer un business en ligne 🚀. De React à CapCut 🎥 et l'IA 🤖, je maîtrise tout. Besoin d'aide ? Contactez-moi sur WhatsApp !",
   image: "/rafien.png",
   banner: "/banier1.png", // Add the path to your banner image here
   socialLinks: [
@@ -47,11 +49,12 @@ const profilData = {
       url: "https://www.tiktok.com/@story.scool",
       color: ""
     },
-    { name: 'GitHub', 
+    {
+      name: 'GitHub',
       icon: <FaGithub className="w-5 h-5 " />
-      , color: '' ,
-      url:"https://github.com/AbdouraoufYoussouf"
-    
+      , color: '',
+      url: "https://github.com/AbdouraoufYoussouf"
+
     },
     {
       icon: <FaWhatsapp className="w-5 h-5 " />,
@@ -85,6 +88,13 @@ const categories: Category[] = [
         link: "https://vvw.french-stream.bio/15117757-cobra-kai-saison-6-2018.html",
         image: "/kai.jpg",
         isPrivate: false
+      },
+      {
+        title: "Mon telegram",
+        description: "Mon canal télélegram Je vous partage mes passions, mes astuces et mes conseils en business.",
+        link: "https://t.me/rafien_fr",
+        image: "/telegram.png",
+        isPrivate: false
       }
     ]
   },
@@ -100,7 +110,7 @@ const categories: Category[] = [
       },
       {
         title: "Ma chaine Youtube Histoire",
-        description: "Des histoires inspirantes et motivantes 35k",
+        description: "Des histoires inspirantes et motivantes 34k abonnés",
         link: "https://www.youtube.com/@storyscool",
         image: "/scool.webp",
         isPrivate: false
@@ -109,13 +119,31 @@ const categories: Category[] = [
   }
 ]
 
-type Props ={
-  pseudo:string
+type Props = {
+  pseudo: string
 }
 
-export default function UserLink({pseudo}:Props) {
+type Contact = {
+  name: string,
+  email: string,
+  pseudo: string
+}
+
+export default function UserLink({ pseudo }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentLink, setCurrentLink] = useState('')
+  const [userInfo, setUserInfo] = useState<Contact>({
+    name: '',
+    email: '',
+    pseudo: ''
+  })
+
+  useEffect(() => {
+    const storedInfo = localStorage.getItem('userInfo')
+    if (storedInfo) {
+      setUserInfo(JSON.parse(storedInfo))
+    }
+  }, [])
 
   const { isLoading, data } = useQuery({
     queryKey: ['profil', pseudo],
@@ -127,15 +155,18 @@ export default function UserLink({pseudo}:Props) {
       return null;
     }
   });
-  
-  
+
   const handleLinkClick = (block: SubBlock) => {
-    if (block.isPrivate) {
+    if (block.isPrivate && !userInfo) {
       setCurrentLink(block.link)
       setIsModalOpen(true)
     } else {
       window.open(block.link, '_blank')
     }
+  }
+
+  if(!isLoading){
+    return <UserLinkSkeleton/>
   }
 
   return (
@@ -169,7 +200,7 @@ export default function UserLink({pseudo}:Props) {
         <div className="p-4 text-center mt-12">
           <div className="">
             <h1 className="text-xl font-bold ">{profilData.name}</h1>
-            <p className="text-sm text-muted-foreground leading-4 text-left mb-4">{profilData.description}</p>
+            <p className="text-sm text-muted-foreground leading-4 text-justify mb-4">{profilData.description}</p>
 
             <motion.div
               className="flex justify-center space-x-1 mb-4"
@@ -208,7 +239,7 @@ export default function UserLink({pseudo}:Props) {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <Card className="overflow-hidden border bg-background text-primary-foreground ">
+                        <Card className="overflow-hidden hover:bg-muted border bg-background text-primary-foreground ">
                           <CardContent className="p-0">
                             <button
                               onClick={() => handleLinkClick(block)}
@@ -226,7 +257,7 @@ export default function UserLink({pseudo}:Props) {
                                   {block.title}
                                   {block.isPrivate && <Lock className="w-4 h-4 ml-2 " />}
                                 </div>
-                                <p className="text-sm text-accent-foreground">{block.description}</p>
+                                <p className="text-sm leading-4 text-accent-foreground">{block.description}</p>
                               </div>
                               <ExternalLink className="w-4 h-4 ml-auto text" />
                             </button>
