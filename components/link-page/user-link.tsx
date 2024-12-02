@@ -165,7 +165,7 @@ export default function UserLink({ pseudo }: Props) {
     }
   }
 
-  if(!isLoading){
+  if(isLoading){
     return <UserLinkSkeleton/>
   }
 
