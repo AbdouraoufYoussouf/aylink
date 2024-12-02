@@ -69,7 +69,7 @@ const categories: Category[] = [
     name: "Films et Séries",
     blocks: [
       {
-        title: "Lioness Operation spécial saison 2",
+        title: "Lioness saison 2",
         description: "Ma série préféré en ce moment",
         link: "https://vvw.french-stream.bio/15118886-lioness-saison-2-2023.html",
         image: "/liones2.jpg",
@@ -136,7 +136,7 @@ export default function UserLink({ pseudo }: Props) {
 
   useEffect(() => {
     const storedInfo = localStorage.getItem('userInfo')
-    console.log('stored:',storedInfo)
+    console.log('stored:', storedInfo)
     if (storedInfo) {
       setUserInfo(JSON.parse(storedInfo))
     }
@@ -156,7 +156,7 @@ export default function UserLink({ pseudo }: Props) {
 
   const handleLinkClick = (block: SubBlock) => {
     if (block.isPrivate) {
-  
+
       if (userInfo?.email) {
         window.open(block.link, '_blank')
       } else {
@@ -205,7 +205,7 @@ export default function UserLink({ pseudo }: Props) {
             className="w-28 h-28 rounded-full mx-auto mb-2 border-4 border-white absolute top-[6rem] left-1/2 shadow-lg  transform -translate-x-1/2"
           />
         </div>
-        <div className="p-4 text-center mt-12">
+        <div className="md:p-4 p-2 text-center mt-12">
           <div className="">
             <h1 className="text-xl font-bold ">{profilData.name}</h1>
             <p className="text-sm text-muted-foreground leading-4 text-justify mb-4">{profilData.description}</p>
@@ -251,23 +251,29 @@ export default function UserLink({ pseudo }: Props) {
                           <CardContent className="p-0">
                             <button
                               onClick={() => handleLinkClick(block)}
-                              className="w-full p-2 text-left  transition-colors duration-200 flex items-center"
+                              className="w-full p-2 text-left relative transition-colors duration-200 flex items-center justify-between"
                             >
-                              <Image
-                                width={48}
-                                height={48}
-                                src={block.image}
-                                alt={block.title}
-                                className="w-12 h-12 rounded mr-3 object-cover"
-                              />
-                              <div>
-                                <div className="font-semibold  flex items-center">
-                                  {block.title}
-                                  {block.isPrivate && <Lock className="w-4 h-4 ml-2 " />}
+                              <div className="flex items-center relative space-x-2">
+                              
+                                <Image
+                                  width={48}
+                                  height={48}
+                                  src={block.image}
+                                  alt={block.title}
+                                  className="w-12 h-12 rounded mr-1 object-cover"
+                                />
+                                <div className='space-y-1'>
+                                  <div className="font-semibold gap-1 leading-4 flex ">
+                                    {block.title}
+                                  </div>
+                                  <p className="text-sm leading-4 text-accent-foreground">{block.description}</p>
                                 </div>
-                                <p className="text-sm leading-4 text-accent-foreground">{block.description}</p>
+
                               </div>
-                              <ExternalLink className="w-4 h-4 ml-auto text" />
+                              <div className='w-8 flex flex-col gap-3  items-end justify-end'>
+                              {block.isPrivate && <Lock className="w-3 h-3 mr-0.5 text-red-500" />}
+                                <ExternalLink className="w-4 h-4 " />
+                              </div>
                             </button>
                           </CardContent>
                         </Card>
@@ -281,9 +287,9 @@ export default function UserLink({ pseudo }: Props) {
         </div>
       </motion.div>
 
-      <GetUserInfos 
-       onUserInfoUpdate={handleUserInfoUpdate}
-      currentLink={currentLink} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <GetUserInfos
+        onUserInfoUpdate={handleUserInfoUpdate}
+        currentLink={currentLink} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </div>
   )
 }

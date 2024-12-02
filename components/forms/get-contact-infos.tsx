@@ -139,11 +139,11 @@ export const GetUserInfos: React.FC<GetContactInfosProps> = ({ isModalOpen,onUse
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-      <DialogContent onInteractOutside={handleInteractOutside} className="w-[425px] rounded-lg">
+      <DialogContent onInteractOutside={handleInteractOutside} className=" max-w-[400px] rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-left">Accès réservé à ma communauté</DialogTitle>
           <DialogDescription className="text-left leading-4">
-            Veuillez entrer votre nom et votre email pour accéder au lien et rejoindre notre cercle privilégié.
+            Veuillez entrer votre nom et votre email pour accéder au lien.
           </DialogDescription>
         </DialogHeader>
         {error && (
@@ -179,9 +179,7 @@ export const GetUserInfos: React.FC<GetContactInfosProps> = ({ isModalOpen,onUse
                 </FormItem>
               )}
             />
-            <p className="text-sm text-gray-500">
-              En soumettant ce formulaire, vous acceptez que nous collections votre adresse IP et des informations de localisation à des fins d'analyse.
-            </p>
+          
             <Button type="submit" className="w-full" disabled={isLoading || isPending}>
               {isLoading || isPending ? <Loader2 className="animate-spin mr-2" /> : null}
               {isLoading || isPending ? "Chargement..." : "Accéder"}
