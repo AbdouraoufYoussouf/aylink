@@ -8,26 +8,24 @@ datasource db {
   // uncomment next line if you use Prisma <5.10
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
-
 model Contact {
-  id       String  @id @default(cuid())
-  email    String  @unique
+  id       String   @id @default(cuid())
+  email    String   @unique
   name     String
   country  String?
   ipAdress String?
   location String?
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String    @unique
-  createdAt DateTime
-  updatedAt DateTime?
+  users    User[]   @relation("UserContacts")
+  createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model User {
   id            String    @id @default(cuid())
   name          String
   email         String    @unique
-  password       String?
+  password      String?
   pseudo        String?    @unique
   description   String?
   image         String?
@@ -36,12 +34,11 @@ model User {
   updatedAt     DateTime  @updatedAt
   emailVerified DateTime?
 
-  accounts Account[]
+  accounts      Account[]
+  socialLinks   SocialLink[]
+  categories    Category[]
 
-  socialLinks SocialLink[]
-  categories  Category[]
-
-  contact Contact?
+  contacts      Contact[] @relation("UserContacts")
 }
 
 model SocialLink {

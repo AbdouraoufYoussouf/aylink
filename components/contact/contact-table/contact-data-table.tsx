@@ -28,6 +28,7 @@ import { MyTooltipProvider } from "@/components/tooltip-provider"
 import { SkeletonRows } from "@/components/skeletons/skeleton-rows"
 import { ContactType } from "@/src/types/contact-type"
 import { getAllContactFilterAction } from "@/actions/contact-action"
+import { useSessionStatus } from "@/hooks/useSessionStatut"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -38,7 +39,7 @@ export function ContactDataTable({
     columns, searchPlaceholder,}: DataTableProps<ContactType, unknown>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [searchTerm, setSearchTerm] = useState("")
-   
+   const {session} = useSessionStatus()
     const [isApplyingSearch, setIsApplyingSearch] = useState(false)
     const [isResetSearch, setIsResetSearch] = useState(false)
   
@@ -48,13 +49,14 @@ export function ContactDataTable({
 
     const [total, setTotal] = useState(0)
 
-
+console.log('pseudo:',session?.user)
 
     const { isLoading, data, refetch } = useQuery({
         queryKey: ['contacts'],
         queryFn: async () => {
             const res = await getAllContactFilterAction({
                 search: searchTerm,
+                pseudo:session?.user.pseudo
             })
             if (res.success === true && res.data) {
                 setTotal(res.total)

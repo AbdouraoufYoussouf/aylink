@@ -132,18 +132,16 @@ type Contact = {
 export default function UserLink({ pseudo }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentLink, setCurrentLink] = useState('')
-  const [userInfo, setUserInfo] = useState<Contact>({
-    name: '',
-    email: '',
-    pseudo: ''
-  })
+  const [userInfo, setUserInfo] = useState<Contact>()
 
   useEffect(() => {
     const storedInfo = localStorage.getItem('userInfo')
+    console.log('stored:',storedInfo)
     if (storedInfo) {
       setUserInfo(JSON.parse(storedInfo))
     }
   }, [])
+
 
   const { isLoading, data } = useQuery({
     queryKey: ['profil', pseudo],
@@ -157,16 +155,26 @@ export default function UserLink({ pseudo }: Props) {
   });
 
   const handleLinkClick = (block: SubBlock) => {
-    if (block.isPrivate && !userInfo) {
-      setCurrentLink(block.link)
-      setIsModalOpen(true)
+    if (block.isPrivate) {
+  
+      if (userInfo?.email) {
+        window.open(block.link, '_blank')
+      } else {
+        setCurrentLink(block.link)
+        setIsModalOpen(true)
+      }
     } else {
       window.open(block.link, '_blank')
     }
   }
 
-  if(isLoading){
-    return <UserLinkSkeleton/>
+  const handleUserInfoUpdate = (newUserInfo: Contact) => {
+    setUserInfo(newUserInfo)
+    localStorage.setItem('userInfo', JSON.stringify(newUserInfo))
+  }
+
+  if (isLoading) {
+    return <UserLinkSkeleton />
   }
 
   return (
@@ -273,7 +281,9 @@ export default function UserLink({ pseudo }: Props) {
         </div>
       </motion.div>
 
-      <GetUserInfos currentLink={currentLink} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <GetUserInfos 
+       onUserInfoUpdate={handleUserInfoUpdate}
+      currentLink={currentLink} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </div>
   )
 }
