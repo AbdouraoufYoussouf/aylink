@@ -4,6 +4,7 @@ import * as React from "react"
 import {
   Bot,
   Command,
+  LayoutDashboard,
   Link,
   User,
   Users,
@@ -105,7 +106,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       //   ],
       // },
     ],
-    projects: [
+    menu: [
+      {
+        name: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+      },
       {
         name: "Mes liens",
         url: "/dashboard/link",
@@ -144,7 +150,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.projects} />
+        <NavProjects projects={data.menu} />
       </SidebarContent>
       <SidebarFooter>
         {

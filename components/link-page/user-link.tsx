@@ -202,10 +202,10 @@ export default function UserLink({ pseudo }: Props) {
             alt="Profile"
             width={112}
             height={112}
-            className="w-28 h-28 rounded-full mx-auto mb-2 border-4 border-white absolute top-[6rem] left-1/2 shadow-lg  transform -translate-x-1/2"
+            className="w-20 h-20 sm:w-28 sm:h-28 rounded-full mx-auto mb-2 border-4 border-white absolute top-[6rem] left-1/2 shadow-lg  transform -translate-x-1/2"
           />
         </div>
-        <div className="md:p-4 p-2 text-center mt-12">
+        <div className="md:p-4 p-2 text-center mt-6 sm:mt-12">
           <div className="">
             <h1 className="text-xl font-bold ">{profilData.name}</h1>
             <p className="text-sm text-muted-foreground leading-4 text-justify mb-4">{profilData.description}</p>

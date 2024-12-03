@@ -20,7 +20,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import {  Loader2, Search,  X } from 'lucide-react'
+import { Loader2, Search, X } from 'lucide-react'
 import { useQuery } from "@tanstack/react-query"
 
 import { cn } from "@/lib/utils"
@@ -29,6 +29,7 @@ import { SkeletonRows } from "@/components/skeletons/skeleton-rows"
 import { ContactType } from "@/src/types/contact-type"
 import { getAllContactFilterAction } from "@/actions/contact-action"
 import { useSessionStatus } from "@/hooks/useSessionStatut"
+import { BtnDeleteContact } from "./btn-delete-contact"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -36,27 +37,25 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function ContactDataTable({
-    columns, searchPlaceholder,}: DataTableProps<ContactType, unknown>) {
+    columns, searchPlaceholder, }: DataTableProps<ContactType, unknown>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [searchTerm, setSearchTerm] = useState("")
-   const {session} = useSessionStatus()
+    const { session } = useSessionStatus()
     const [isApplyingSearch, setIsApplyingSearch] = useState(false)
     const [isResetSearch, setIsResetSearch] = useState(false)
-  
+
     const [showPagination, setShowPagination] = useState(true)
     const [lastScrollPosition, setLastScrollPosition] = useState(0)
 
 
     const [total, setTotal] = useState(0)
 
-console.log('pseudo:',session?.user)
-
     const { isLoading, data, refetch } = useQuery({
         queryKey: ['contacts'],
         queryFn: async () => {
             const res = await getAllContactFilterAction({
                 search: searchTerm,
-                pseudo:session?.user.pseudo
+                pseudo: session?.user.pseudo
             })
             if (res.success === true && res.data) {
                 setTotal(res.total)
@@ -68,9 +67,6 @@ console.log('pseudo:',session?.user)
         staleTime: Infinity,
         gcTime: Infinity,
     })
-
-
-
 
     const table = useReactTable({
         data: data || [],
@@ -91,7 +87,6 @@ console.log('pseudo:',session?.user)
 
     const totalPages = Math.ceil((total) / 100)
 
- 
     const handleApplySearch = useCallback(async () => {
         setIsApplyingSearch(true)
         await refetch()
@@ -105,17 +100,11 @@ console.log('pseudo:',session?.user)
         setIsResetSearch(false)
     }, [refetch])
 
-
-
     useEffect(() => {
         if (searchTerm === "" || searchTerm.length >= 3) {
             refetch()
         }
     }, [searchTerm, refetch])
-
- 
-
-
 
     useEffect(() => {
         const handleScroll = () => {
@@ -131,9 +120,11 @@ console.log('pseudo:',session?.user)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [lastScrollPosition])
 
+    const contactsIds = table.getFilteredSelectedRowModel().rows.map((item) => item.original.id)
+
     return (
         <div className="w-full overflow-auto">
-            <div className="flex items-center justify-between w-full py-4">
+            <div className="flex items-center justify-between w-full mb-4">
                 <div className="flex gap-2 ">
                     <h1 className="font-bold text-nowrap border text-center flex items-center px-2 rounded-md">Total : {total}</h1>
                     <div className="relative w-full">
@@ -176,8 +167,13 @@ console.log('pseudo:',session?.user)
                     </div>
                 </div>
 
+                <div>
+                {
+                        contactsIds.length > 0 ?
+                            <BtnDeleteContact setRowSelection={() => table.setRowSelection({})} contactIdsSelected={contactsIds} /> : null
+                    }
+                </div>
 
-             
             </div>
 
             <div className="rounded-md border">
@@ -205,7 +201,7 @@ console.log('pseudo:',session?.user)
                             ) :
                                 table.getRowModel().rows.length ? (
                                     table.getRowModel().rows.map((row) => {
-                                    
+
                                         return (
                                             <TableRow
                                                 key={row.id}
@@ -248,11 +244,11 @@ console.log('pseudo:',session?.user)
                             {table.getFilteredRowModel().rows.length} ligne(s) selectionné.
                         </div>
 
-               
+
                     </div>
                 </div>
             )}
-        
+
         </div>
     )
 }

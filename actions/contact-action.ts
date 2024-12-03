@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { action } from "@/lib/zsa"
 import { contactInfoSchema } from "@/src/shemas/get-contact-info-shema";
 import { ContactType, FilterContactParams } from "@/src/types/contact-type";
+import { z } from "zod";
 
 
 export const saveContactInfosAction = action
@@ -62,48 +63,77 @@ export const saveContactInfosAction = action
 
 
 
-  export const getAllContactFilterAction = async (filters: FilterContactParams) => {
-    try {
-      const { search, pseudo } = filters;
-  
-      // Trouver l'utilisateur par pseudo
-      const user = await db.user.findUnique({
-        where: { pseudo },
-        include: { contacts: true }, // Charger les contacts liés
-      });
-  
-      if (!user) {
-        console.log("Cet utilisateur n'existe pas.");
-        return { success: false, message: "Cet utilisateur n'existe pas." };
-      }
-  
-      // Appliquer des filtres de recherche si nécessaire
-      const filteredContacts = user.contacts.filter((contact) => {
-        if (!search) return true; // Si pas de recherche, inclure tous les contacts
-        return (
-          contact.name.toLowerCase().includes(search.toLowerCase()) ||
-          contact.email.toLowerCase().includes(search.toLowerCase())
-        );
-      });
-  
-      // Transformer les données pour le client
-      const response:ContactType[] = filteredContacts.map((contact) => ({
-        id: contact.id,
-        name: contact.name,
-        email: contact.email,
-        location: contact.location ?? "",
-        country: contact.country ?? "",
-      }));
-  
-      return {
-        success: true,
-        data: response,
-        total: filteredContacts.length,
-        message: "Contacts récupérés avec succès !",
-      };
-    } catch (error) {
-      console.error("Erreur lors de la récupération des contacts !", error);
-      return { success: false, message: "Erreur lors de la récupération des contacts !" };
+export const getAllContactFilterAction = async (filters: FilterContactParams) => {
+  try {
+    const { search, pseudo } = filters;
+
+    // Trouver l'utilisateur par pseudo
+    const user = await db.user.findUnique({
+      where: { pseudo },
+      include: { contacts: true }, // Charger les contacts liés
+    });
+
+    if (!user) {
+      console.log("Cet utilisateur n'existe pas.");
+      return { success: false, message: "Cet utilisateur n'existe pas." };
     }
-  };
-  
+
+    // Appliquer des filtres de recherche si nécessaire
+    const filteredContacts = user.contacts.filter((contact) => {
+      if (!search) return true; // Si pas de recherche, inclure tous les contacts
+      return (
+        contact.name.toLowerCase().includes(search.toLowerCase()) ||
+        contact.email.toLowerCase().includes(search.toLowerCase())
+      );
+    });
+
+    // Transformer les données pour le client
+    const response: ContactType[] = filteredContacts.map((contact) => ({
+      id: contact.id,
+      name: contact.name,
+      email: contact.email,
+      location: contact.location ?? "",
+      country: contact.country ?? "",
+    }));
+
+    return {
+      success: true,
+      data: response,
+      total: filteredContacts.length,
+      message: "Contacts récupérés avec succès !",
+    };
+  } catch (error) {
+    console.error("Erreur lors de la récupération des contacts !", error);
+    return { success: false, message: "Erreur lors de la récupération des contacts !" };
+  }
+};
+
+export const deleteManyContactAction = action
+  .input(
+    z.object({
+      contactsIds: z.array(z.string()),
+    })
+  )
+  .handler(async ({ input }) => {
+    const { contactsIds } = input;
+
+    try {
+      // Vérifie si les contacts existent
+      const existingContacts = await db.contact.findMany({
+        where: { id: { in: contactsIds } },
+      });
+
+      if (existingContacts.length === 0) {
+        return { success: false, message: "Aucun contact trouvé" };
+      }
+
+      await db.contact.deleteMany({
+        where: { id: { in: contactsIds } },
+      })
+
+      return { success: true, message: "contacts supprimés avec succès" };
+    } catch (error) {
+      console.error("Erreur lors de la suppression des contacts :", error);
+      return { success: false, message: "Erreur lors de la suppression des contacts." };
+    }
+  });
