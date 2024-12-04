@@ -24,8 +24,12 @@ export const Navbar = () => {
             </div>
           </div>
           <div className="hidden md:block">
-            <Button variant="outline" className="mr-2">Login</Button>
+            <Link href={'/auth/login'}>
+              <Button variant="outline" className="mr-2">Login</Button>
+            </Link>
+            <Link href={'/auth/register'}>
             <Button>Register</Button>
+            </Link>
           </div>
           <div className="md:hidden">
             <button
@@ -37,7 +41,7 @@ export const Navbar = () => {
               <Menu className="block h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-      
+
         </div>
       </div>
 

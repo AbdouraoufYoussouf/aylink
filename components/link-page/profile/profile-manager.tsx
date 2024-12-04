@@ -7,10 +7,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
 import { Trash2, Plus, Instagram, Mail, Phone, Camera, Edit2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { AutoResizeTextarea } from "@/components/auto-rezise-textarea"
 
 interface SocialLink {
   id: number
@@ -70,8 +70,8 @@ export default function ProfileManager() {
 
   return (
     <div className=" w-full py-4  flex items-center justify-center overflow-hidden">
-      <Card className="w-full max-w-4xl bg-muted backdrop-blur-lg shadow-2xl overflow-hidden">
-        <CardContent className="p-6 sm:p-8 md:p-10">
+      <Card className="w-full  backdrop-blur-lg shadow-2xl overflow-hidden">
+        <CardContent className="p-2 sm:p-8 md:p-10">
           <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -79,12 +79,12 @@ export default function ProfileManager() {
               transition={{ duration: 0.5 }}
               className="relative group"
             >
-              <Avatar className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 border-4 border-white shadow-lg">
-                <AvatarImage src="/placeholder.svg" />
+              <Avatar className="w-32 h-32 md:w-40 md:h-40 border-4 border-white shadow-lg">
+                <AvatarImage src="/rafien.png" />
                 <AvatarFallback>RA</AvatarFallback>
               </Avatar>
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full">
-                <Camera className="text-white w-8 h-8" />
+                <Camera className=" w-8 h-8" />
               </div>
             </motion.div>
             <div className="flex-1 space-y-6 text-center md:text-left">
@@ -98,7 +98,7 @@ export default function ProfileManager() {
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="text-3xl sm:text-4xl md:text-5xl font-bold bg-transparent border-none text-white text-center md:text-left"
+                  className="text-3xl h-12 sm:text-4xl md:text-5xl font-bold bg-transparent border-none  text-center md:text-left"
                   readOnly={!isEditing}
                 />
               </motion.div>
@@ -108,13 +108,14 @@ export default function ProfileManager() {
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
                 <Label htmlFor="bio" className="sr-only">Bio</Label>
-                <Textarea
+                <AutoResizeTextarea
                   id="bio"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="w-full bg-white/20 border-none text-white resize-none"
+                  className="w-full bg-white/20 border-none  resize-none"
                   readOnly={!isEditing}
                 />
+
               </motion.div>
             </div>
           </div>
@@ -126,7 +127,7 @@ export default function ProfileManager() {
             className="mt-8 space-y-4"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-white">Réseaux sociaux</h3>
+              <h3 className="text-xl font-semibold ">Réseaux sociaux</h3>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -134,7 +135,7 @@ export default function ProfileManager() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setIsEditing(!isEditing)}
-                      className="text-white hover:bg-white/20"
+                      className=" hover:bg-white/20"
                     >
                       <Edit2 className="h-5 w-5" />
                     </Button>
@@ -145,15 +146,18 @@ export default function ProfileManager() {
                 </Tooltip>
               </TooltipProvider>
             </div>
+            <div className="grid  md:grid-cols-2 gap-4">
+
+        
             {socialLinks.map((link, index) => (
               <motion.div
                 key={link.id}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.1 * index }}
-                className="flex items-center gap-4 rounded-lg bg-white/20 p-4"
+                className="flex items-center gap-3 rounded-lg bg-accent px-2 py-1"
               >
-                <div className="text-white">
+                <div className="">
                   {getSocialIcon(link.type)}
                 </div>
                 <Input
@@ -165,7 +169,7 @@ export default function ProfileManager() {
                       )
                     )
                   }
-                  className="flex-1 bg-transparent border-none text-white placeholder-white/50"
+                  className="flex-1 bg-transparent border-none "
                   placeholder={`Entrez votre ${link.type}`}
                   readOnly={!isEditing}
                 />
@@ -179,7 +183,7 @@ export default function ProfileManager() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(link.id)}
-                      className="text-white hover:text-red-300 hover:bg-red-400/10"
+                      className=" hover:text-red-300 hover:bg-red-400/10"
                     >
                       <Trash2 className="h-5 w-5" />
                     </Button>
@@ -187,6 +191,7 @@ export default function ProfileManager() {
                 )}
               </motion.div>
             ))}
+                </div>
             {isEditing && (
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
@@ -195,7 +200,7 @@ export default function ProfileManager() {
               >
                 <Button
                   onClick={addSocialLink}
-                  className="w-full bg-white/20 hover:bg-white/30 text-white"
+                  className="w-full bg-white/20 hover:bg-white/30 "
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Ajouter un réseau social

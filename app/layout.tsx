@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import MyProviders from "@/components/providers/my-provider";
 import { auth } from "@/auth";
+import NextTopLoader from 'nextjs-toploader';
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,10 +34,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-      <MyProviders session={session}>
-            <main>{children}</main>
-      </MyProviders>
-   
+        <NextTopLoader showSpinner={false} />
+        <MyProviders session={session}>
+          <main>{children}</main>
+        </MyProviders>
       </body>
     </html>
   );

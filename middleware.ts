@@ -10,12 +10,12 @@ export default auth((req: { auth?: any; nextUrl?: any; }) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
-  // Si l'utilisateur est connecté et sur la page d'accueil, rediriger vers /dashboard
-  // if (isLoggedIn && nextUrl.pathname === '/') {
-  //   return NextResponse.redirect(new URL('/dashboard', nextUrl));
-  // }
+  // Si l'utilisateur est connecté et sur la page de connexion, rediriger vers /dashboard
+  if (isLoggedIn && nextUrl.pathname === '/auth/login') {
+    return NextResponse.redirect(new URL('/dashboard', nextUrl));
+  }
 
-  // Si l'utilisateur n'est pas connecté et essaie d'accéder à /dashboard, rediriger vers la page d'accueil
+  // Si l'utilisateur n'est pas connecté et essaie d'accéder à /dashboard, rediriger vers la page de connexion
   if (!isLoggedIn && nextUrl.pathname.startsWith('/dashboard')) {
     return NextResponse.redirect(new URL('/auth/login', nextUrl));
   }
