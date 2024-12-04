@@ -1,4 +1,4 @@
-import { Navbar } from '@/components/ladingpage/navbar';
+import { Navbar } from '@/components/landingpage/navbar';
 import React from 'react'
 
 export default function DashboardLayout({

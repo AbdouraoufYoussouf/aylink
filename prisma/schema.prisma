@@ -3,21 +3,22 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   // uncomment next line if you use Prisma <5.10
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
+
 model Contact {
-  id       String   @id @default(cuid())
-  email    String   @unique
+  id       String  @id @default(cuid())
+  email    String  @unique
   name     String
   country  String?
   ipAdress String?
   location String?
 
-  users    User[]   @relation("UserContacts")
-  createdAt DateTime @default(now())
+  users     User[]    @relation("UserContacts")
+  createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 }
 
@@ -26,7 +27,7 @@ model User {
   name          String
   email         String    @unique
   password      String?
-  pseudo        String?    @unique
+  pseudo        String?   @unique
   description   String?
   image         String?
   banner        String?
@@ -34,22 +35,24 @@ model User {
   updatedAt     DateTime  @updatedAt
   emailVerified DateTime?
 
-  accounts      Account[]
-  socialLinks   SocialLink[]
-  categories    Category[]
+  accounts    Account[]
+  socialLinks SocialLink[]
+  categories  Category[]
 
-  contacts      Contact[] @relation("UserContacts")
+  contacts Contact[] @relation("UserContacts")
 }
 
 model SocialLink {
   id        String    @id @default(cuid())
-  icon      String
+  name      String
   url       String
-  color     String
   userId    String
+  isActive  Boolean   @default(false)
   user      User      @relation(fields: [userId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+
+  @@unique([userId, name])
 }
 
 model Category {

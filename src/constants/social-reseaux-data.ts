@@ -39,9 +39,6 @@ import {
   import { FcGoogle } from "react-icons/fc";
   import { IoMdMail } from "react-icons/io";
 
-
-
-
   export const iconReseaux: IconReseauxType[] = [
     { name: 'Facebook', icon: FaFacebook, color: '#2f55a4' },
     { name: 'Gmail', icon: IoMdMail, color: 'white' },

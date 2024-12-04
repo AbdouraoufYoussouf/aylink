@@ -7,56 +7,175 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Trash2, Plus, Instagram, Mail, Phone, Camera, Edit2 } from 'lucide-react'
+import { Trash2, Plus, Camera, Edit2, X, Loader2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { AutoResizeTextarea } from "@/components/auto-rezise-textarea"
+import { MyTooltipProvider } from "@/components/tooltip-provider"
+import { AddReseauSocialModal } from "./add-reseaux-social-modal"
+import { useProfileStore } from "@/store/user-profil-store"
+import { FaCheck } from "react-icons/fa"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import ImageCropper from "@/components/image-cropper"
+import { sanitizeInput } from "@/lib/sanitize-input"
+import { getProfilUser, updateProfileAction } from "@/actions/user-action"
+import { useQuery } from "@tanstack/react-query"
+import { useSessionStatus } from "@/hooks/useSessionStatut"
+import { SocialLinkType } from "@/src/types/reseaux-type"
+import { mapSocialLinks } from "@/lib/user-utils"
+import { iconReseaux } from "@/src/constants/social-reseaux-data"
+import { UserProfilType } from "@/src/types/user-type"
+import Image from "next/image"
 
-interface SocialLink {
-  id: number
-  type: "instagram" | "email" | "phone"
-  value: string
-  isActive: boolean
-}
+const socialMediaPrefixes: { [key: string]: string } = {
+  Twitter: "https://twitter.com/",
+  Facebook: "https://facebook.com/",
+  Instagram: "https://instagram.com/",
+  LinkedIn: "https://linkedin.com/in/",
+  // Add more social media prefixes as needed
+};
 
 export default function ProfileManager() {
-  const [username, setUsername] = useState("rafien")
-  const [bio, setBio] = useState("Je propose du développement web et du montage vidéo 🚀 Discutons de votre projet via WhatsApp ou mail ! ☀️ Et comme tout le monde, j'ai un faible pour les séries, alors profitez-en !")
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
-    { id: 1, type: "instagram", value: "https://www.instagram.com/rafien.fr", isActive: true },
-    { id: 2, type: "email", value: "youssouf.abdouraouf4@gmail.com", isActive: true },
-    { id: 3, type: "phone", value: "+212633851644", isActive: true },
-  ])
+  const { user, setProfile, removeSocialLink, allSocialLinks, toggleSocialLink, updateSocialLinks } = useProfileStore()
+  const [isAddReseau, setIsAddReseau] = useState(false)
+  const [newUsername, setNewUsername] = useState<string>('')
+  const [newBio, setNewBio] = useState<string>("")
+  const [newImage, setNewImage] = useState<string>("")
+  const [newBanner, setNewBanner] = useState<string>("")
   const [isEditing, setIsEditing] = useState(false)
+  const [isCropping, setIsCropping] = useState(false)
+  const [tempImageUrl, setTempImageUrl] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
+  const [socialLinks, setSocialLinks] = useState<SocialLinkType[]>([])
 
-  const handleToggle = (id: number) => {
-    setSocialLinks(links =>
-      links.map(link =>
-        link.id === id ? { ...link, isActive: !link.isActive } : link
-      )
-    )
-  }
+  const { session } = useSessionStatus()
 
-  const handleDelete = (id: number) => {
-    setSocialLinks(links => links.filter(link => link.id !== id))
-  }
-
-  const addSocialLink = () => {
-    const newId = Math.max(0, ...socialLinks.map(link => link.id)) + 1
-    setSocialLinks([...socialLinks, { id: newId, type: "instagram", value: "", isActive: true }])
-  }
-
-  const getSocialIcon = (type: string) => {
-    switch (type) {
-      case "instagram":
-        return <Instagram className="h-5 w-5" />
-      case "email":
-        return <Mail className="h-5 w-5" />
-      case "phone":
-        return <Phone className="h-5 w-5" />
-      default:
-        return null
+  const { isLoading } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      if (session?.user) {
+        const response = await getProfilUser(session?.user.id!)
+        if (response.success && response.data) {
+          const socialLinks = mapSocialLinks(response.data.socialLinks, iconReseaux);
+          const profileData: UserProfilType = {
+            id: response.data.id,
+            pseudo: response.data.pseudo,
+            image: response.data.image,
+            description: response.data.description,
+            banner: response.data.banner,
+            socialLinks
+          }
+          setProfile(profileData)
+          setSocialLinks(socialLinks)
+          return response.data
+        }
+      }
+      return []
     }
+  })
+
+  const handleDelete = (name: string) => {
+    removeSocialLink(name)
+  }
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, isBanner: boolean = false) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const imageUrl = URL.createObjectURL(file)
+      if (isBanner) {
+        setBannerFile(file)
+        setNewBanner(imageUrl)
+      } else {
+        setTempImageUrl(imageUrl)
+        setIsCropping(true)
+      }
+    }
+  }
+
+  const handleCropComplete = async (croppedImageBlob: Blob) => {
+    const file = new File([croppedImageBlob], 'profile-image.jpg', { type: 'image/jpeg' })
+    setImageFile(file)
+    setNewImage(URL.createObjectURL(file))
+    setIsCropping(false)
+    setTempImageUrl(null)
+  }
+
+  const handleSaveChanges = async () => {
+    setIsPending(true)
+    const sanitizedUsername = sanitizeInput(newUsername!)
+    const sanitizedBio = sanitizeInput(newBio!)
+
+    const formData = new FormData()
+    formData.append('username', sanitizedUsername)
+    formData.append('bio', sanitizedBio)
+    formData.append('imageUrl', newImage!)
+    formData.append('bannerUrl', newBanner!)
+    if (imageFile) {
+      formData.append('image', imageFile)
+    }
+    if (bannerFile) {
+      formData.append('banner', bannerFile)
+    }
+    socialLinks.forEach((link, index) => {
+      formData.append(`socialLinks[${index}][name]`, link.name)
+      formData.append(`socialLinks[${index}][value]`, link.url)
+      formData.append(`socialLinks[${index}][isActive]`, link.isActive.toString())
+    })
+
+    try {
+      const response = await updateProfileAction(formData)
+
+      if (response?.success) {
+        setImageFile(null)
+        setBannerFile(null)
+        setIsEditing(false)
+      } else {
+        console.error('Failed to update profile')
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+    } finally {
+      setIsPending(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setNewUsername(user?.pseudo!)
+    setNewBio(user?.description!)
+    setNewImage(user?.image!)
+    setNewBanner(user?.banner!)
+    setIsEditing(false)
+    setSocialLinks(user?.socialLinks!)
+  }
+
+  const handleSocialLinkChange = (name: string, value: string) => {
+    const updatedLinks = socialLinks.map(link => {
+      if (link.name === name) {
+        // Add prefix if not present
+        const prefix = socialMediaPrefixes[name] || ""
+        const formattedValue = value.startsWith(prefix) ? value : prefix + value
+        return { ...link, url: formattedValue }
+      }
+      return link
+    })
+    setSocialLinks(updatedLinks)
+    updateSocialLinks(updatedLinks)
+  }
+
+  const handleAddSocialLinks = (newLinks: SocialLinkType[]) => {
+    const updatedLinks = [...socialLinks, ...newLinks].map(link => ({
+      ...link,
+      url: socialMediaPrefixes[link.name] || ""
+    }))
+    setSocialLinks(updatedLinks)
+    updateSocialLinks(updatedLinks)
   }
 
   useEffect(() => {
@@ -68,57 +187,149 @@ export default function ProfileManager() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  return (
-    <div className=" w-full py-4  flex items-center justify-center overflow-hidden">
-      <Card className="w-full  backdrop-blur-lg shadow-2xl overflow-hidden">
-        <CardContent className="p-2 sm:p-8 md:p-10">
-          <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative group"
-            >
-              <Avatar className="w-32 h-32 md:w-40 md:h-40 border-4 border-white shadow-lg">
-                <AvatarImage src="/rafien.png" />
-                <AvatarFallback>RA</AvatarFallback>
-              </Avatar>
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full">
-                <Camera className=" w-8 h-8" />
-              </div>
-            </motion.div>
-            <div className="flex-1 space-y-6 text-center md:text-left">
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <Label htmlFor="username" className="sr-only">Username</Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="text-3xl h-12 sm:text-4xl md:text-5xl font-bold bg-transparent border-none  text-center md:text-left"
-                  readOnly={!isEditing}
-                />
-              </motion.div>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                <Label htmlFor="bio" className="sr-only">Bio</Label>
-                <AutoResizeTextarea
-                  id="bio"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  className="w-full bg-white/20 border-none  resize-none"
-                  readOnly={!isEditing}
-                />
+  useEffect(() => {
+    setNewUsername(user?.pseudo!)
+    setNewBio(user?.description!)
+    setNewImage(user?.image!)
+    setNewBanner(user?.banner!)
+    setSocialLinks(user?.socialLinks!)
+  }, [user])
 
-              </motion.div>
-            </div>
+  return (
+    <div className="w-full max-w-3xl py-4 relative flex items-center justify-center overflow-hidden">
+      <header className="absolute top-5 right-0 z-10 m-2">
+        {isEditing ? (
+          <div className="flex space-x-2">
+            <MyTooltipProvider content="Enregistrer les modifications">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleSaveChanges}
+                className="hover:bg-white/20 h-8 w-8  text-green-600"
+              >
+                {isPending ? <Loader2 className="animate-spin" /> : <FaCheck className="h-5 w-5" />}
+              </Button>
+            </MyTooltipProvider>
+            <MyTooltipProvider content="Annuler les modifications">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleCancelEdit}
+                className="hover:bg-white/20 h-8 w-8  text-red-600"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </MyTooltipProvider>
           </div>
+        ) : (
+          <MyTooltipProvider content="Modifier le profil">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsEditing(true)}
+              className="hover:bg-white/20"
+            >
+              <Edit2 className="h-5 w-5" />
+            </Button>
+          </MyTooltipProvider>
+        )}
+      </header>
+      <Card className="w-full mt-2 relative backdrop-blur-lg shadow-2xl overflow-hidden">
+
+        <CardContent className="p-2 sm:p-8 md:p-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full  shadow-xl overflow-hidden"
+          >
+            <div className="relative h-40">
+              {
+                newBanner ?
+                  <Image
+                    width={1000} height={100}
+                    src={newBanner}
+                    alt="Banner"
+                    layout="contain"
+                    objectFit="cover"
+                    className=" h-full rounded-lg"
+                  /> :
+                  <div className="w-full h-full bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-lg font-semibold">Add a banner image</span>
+                  </div>
+              }
+              {isEditing && (
+                <label htmlFor="banner-upload" className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer">
+                  <Camera className="w-8 h-8 text-white" />
+                  <input
+                    id="banner-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleImageUpload(e, true)}
+                  />
+                </label>
+              )}
+              <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2">
+                <Avatar className="w-28 h-28 border-4 border-white shadow-lg">
+                  <AvatarImage src={newImage} />
+                  <AvatarFallback>RA</AvatarFallback>
+                </Avatar>
+                {isEditing && (
+                  <label htmlFor="image-upload" className="absolute inset-0  flex items-center justify-center  group-hover:opacity-100 transition-opacity duration-300 rounded-full cursor-pointer">
+                    <Camera className="w-8 h-8 text-white" />
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+            <div className="md:p-4 p-2 text-center mt-16">
+              <div className="space-y-4">
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  <Label htmlFor="username" className="sr-only">Username</Label>
+                  {
+                    isEditing ?
+                      <Input
+                        id="username"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                        className="  font-bold bg-transparent  text-center"
+                        readOnly={!isEditing}
+                      /> :
+                      <span>{newUsername}</span>
+                  }
+                </motion.div>
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <Label htmlFor="bio" className="sr-only">Bio</Label>
+                  {isEditing ? (
+                    <AutoResizeTextarea
+                      id="bio"
+                      value={newBio}
+                      onChange={(e) => setNewBio(e.target.value)}
+                      className="w-full resize-none text-sm text-muted-foreground leading-4 text-justify"
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground leading-4 text-justify mb-4">{newBio}</p>
+                  )}
+                </motion.div>
+
+              </div>
+            </div>
+          </motion.div>
 
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -127,71 +338,50 @@ export default function ProfileManager() {
             className="mt-8 space-y-4"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold ">Réseaux sociaux</h3>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsEditing(!isEditing)}
-                      className=" hover:bg-white/20"
-                    >
-                      <Edit2 className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isEditing ? "Terminer l'édition" : "Modifier le profil"}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <h3 className="text-xl font-semibold">Réseaux sociaux</h3>
             </div>
-            <div className="grid  md:grid-cols-2 gap-4">
-
-        
-            {socialLinks.map((link, index) => (
-              <motion.div
-                key={link.id}
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.1 * index }}
-                className="flex items-center gap-3 rounded-lg bg-accent px-2 py-1"
-              >
-                <div className="">
-                  {getSocialIcon(link.type)}
-                </div>
-                <Input
-                  value={link.value}
-                  onChange={(e) =>
-                    setSocialLinks(links =>
-                      links.map(l =>
-                        l.id === link.id ? { ...l, value: e.target.value } : l
-                      )
-                    )
-                  }
-                  className="flex-1 bg-transparent border-none "
-                  placeholder={`Entrez votre ${link.type}`}
-                  readOnly={!isEditing}
-                />
-                {isEditing && (
-                  <>
-                    <Switch
-                      checked={link.isActive}
-                      onCheckedChange={() => handleToggle(link.id)}
+            <div className="grid md:grid-cols-2 gap-4">
+              {socialLinks?.map((link, index) => (
+                <motion.div
+                  key={link.id}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.1 * index }}
+                  className="flex items-center rounded-lg bg-accent px-2 py-1"
+                >
+                  <div>
+                    {
+                      link.icon && <link.icon color={link.color} size={25} />
+                    }
+                  </div>
+                  <div className="flex-1 m-1">
+                    <Input
+                      value={link.url}
+                      onChange={(e) => handleSocialLinkChange(link.name, e.target.value)}
+                      className="bg-transparent border-none"
+                      placeholder={`Entrez votre ${link.name}`}
+                      readOnly={!isEditing}
                     />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(link.id)}
-                      className=" hover:text-red-300 hover:bg-red-400/10"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </Button>
-                  </>
-                )}
-              </motion.div>
-            ))}
-                </div>
+                  </div>
+                  {isEditing && (
+                    <div className="space-x-1">
+                      <Switch
+                        checked={link.isActive}
+                        onCheckedChange={() => toggleSocialLink(link.name)}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(link.name)}
+                        className="hover:text-red-300 hover:bg-red-400/10"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
             {isEditing && (
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
@@ -199,8 +389,8 @@ export default function ProfileManager() {
                 transition={{ duration: 0.3 }}
               >
                 <Button
-                  onClick={addSocialLink}
-                  className="w-full bg-white/20 hover:bg-white/30 "
+                  onClick={() => setIsAddReseau(true)}
+                  className="w-full bg-white/20 hover:bg-white/30"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Ajouter un réseau social
@@ -208,8 +398,26 @@ export default function ProfileManager() {
               </motion.div>
             )}
           </motion.div>
+          <AddReseauSocialModal  handleAddSocial={handleAddSocialLinks} isOpen={isAddReseau} onClose={() => setIsAddReseau(false)} />
         </CardContent>
       </Card>
+
+      <Dialog open={isCropping} onOpenChange={setIsCropping}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Recadrer l'image</DialogTitle>
+            <DialogDescription>
+              Ajustez le cadrage de votre image de profil
+            </DialogDescription>
+          </DialogHeader>
+          {tempImageUrl && (
+            <ImageCropper
+              imageUrl={tempImageUrl}
+              onCropCompleted={handleCropComplete}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

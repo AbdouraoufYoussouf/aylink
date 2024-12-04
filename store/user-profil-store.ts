@@ -1,53 +1,75 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { iconReseaux } from "@/src/constants/social-reseaux-data";
-
-interface SocialLink {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  color: string;
-  value: string;
-  isActive: boolean;
-}
+import { SocialLinkType } from "@/src/types/reseaux-type";
+import { updateProfileType, UserProfilType } from "@/src/types/user-type";
 
 interface ProfileState {
-  username: string;
-  bio: string;
-  socialLinks: SocialLink[];
-  availableLinks: SocialLink[];
-  selectSocialLink: (name: string) => void;
-  addSelectedSocialLinks: () => void;
-  removeAvailableLink: (name: string) => void;
+  user: UserProfilType | null;
+
+  allSocialLinks: SocialLinkType[];
+  setProfile: (profil: UserProfilType) => void,
+  updateProfile: (newProfil: updateProfileType) => void,
+  updateSocialLinks: (newSocialLinks: SocialLinkType[]) => void,
+  addSelectedSocialLinks: (reseauxSelacteds: SocialLinkType[]) => void;
+  removeSocialLink: (name: string) => void;
+  toggleSocialLink: (name: string) => void;
 }
 
-
 export const useProfileStore = create<ProfileState>((set) => ({
-  username: "rafien",
-  bio: "Développeur et créateur de contenu.",
-  socialLinks: [],
-  availableLinks: iconReseaux.map((item) => ({
+  user: null,
+  allSocialLinks: iconReseaux.map((item) => ({
     id: uuidv4(),
     ...item,
-    value: "",
+    url: "",
     isActive: false,
   })),
-  selectSocialLink: (name) =>
-    set((state) => ({
-      availableLinks: state.availableLinks.map((link) =>
-        link.name === name ? { ...link, isActive: !link.isActive } : link
-      ),
-    })),
-  addSelectedSocialLinks: () =>
-    set((state) => {
-      const selectedLinks = state.availableLinks.filter((link) => link.isActive);
-      return {
-        socialLinks: [...state.socialLinks, ...selectedLinks],
-        availableLinks: state.availableLinks.filter((link) => !link.isActive),
-      };
-    }),
-  removeAvailableLink: (name) =>
-    set((state) => ({
-      availableLinks: state.availableLinks.filter((link) => link.name !== name),
-    })),
+  setProfile: (profile) => set({ user: profile }),
+  updateProfile: (newProfile) => set((state) => ({
+    user: state.user ? { ...state.user, ...newProfile } : null
+  })),
+  updateSocialLinks: (newSocialLinks) => set((state) => ({
+    user: state.user ? { ...state.user, socialLinks: newSocialLinks } : null
+  })),
+
+  addSelectedSocialLinks: (selectedLinks) => set((state) => {
+    if (!state.user) return state;
+    const updatedSocialLinks = [...(state.user.socialLinks || []), ...selectedLinks];
+    const updatedAllSocialLinks = state.allSocialLinks.filter(
+      (link) => !selectedLinks.some((selected) => selected.name === link.name)
+    );
+    return {
+      user: { ...state.user, socialLinks: updatedSocialLinks },
+      allSocialLinks: updatedAllSocialLinks,
+    };
+  }),
+
+  removeSocialLink: (name) => set((state) => {
+    if (!state.user) return state;
+    const updatedSocialLinks = state.user.socialLinks.filter((link) => link.name !== name);
+    const removedLink = state.user.socialLinks.find(link => link.name === name);
+
+    if (removedLink) {
+      const fullLinkInfo = state.allSocialLinks.find(link => link.name === name);
+      if (fullLinkInfo) {
+        return {
+          user: { ...state.user, socialLinks: updatedSocialLinks },
+          allSocialLinks: [...state.allSocialLinks, { ...fullLinkInfo, url: removedLink.url, isActive: false }],
+        };
+      }
+    }
+
+    return {
+      user: { ...state.user, socialLinks: updatedSocialLinks },
+    };
+  }),
+
+  toggleSocialLink: (name) => set((state) => {
+    if (!state.user) return state;
+    const updatedSocialLinks = state.user.socialLinks.map((link) =>
+      link.name === name ? { ...link, isActive: !link.isActive } : link
+    );
+    return { user: { ...state.user, socialLinks: updatedSocialLinks } };
+  }),
+
 }));

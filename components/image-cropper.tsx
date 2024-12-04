@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 
 interface ImageCropperProps {
   imageUrl: string
-  onCropCompleted: (croppedImageUrl: string) => void
+  onCropCompleted: (croppedImageBlob: Blob) => void
 }
 
 const ImageCropper: React.FC<ImageCropperProps> = ({ imageUrl, onCropCompleted }) => {
@@ -59,7 +59,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({ imageUrl, onCropCompleted }
   )
 }
 
-async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<string | null> {
+async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob | null> {
   const image = await createImage(imageSrc)
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -90,7 +90,7 @@ async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<string 
         resolve(null)
         return
       }
-      resolve(URL.createObjectURL(blob))
+      resolve(blob)
     }, 'image/jpeg')
   })
 }

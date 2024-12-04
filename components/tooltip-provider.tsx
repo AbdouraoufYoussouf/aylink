@@ -1,17 +1,19 @@
+import { ReactNode } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 
 type TooltipProps = {
-    trigger: React.ReactNode,
     content: React.ReactNode | string,
     align?: "start" | "center" | "end",
     side?: "top" | "bottom" | "left" | "right",
     sideOffset?: number,
     delayDuration?: number,
+    children: ReactNode; // Le composant enfant à encapsuler
+
 }
 
 export const MyTooltipProvider = ({
-    trigger,
+    children,
     content,
     align = "center",
     side = "top",
@@ -21,9 +23,7 @@ export const MyTooltipProvider = ({
     return (
         <TooltipProvider delayDuration={delayDuration}>
             <Tooltip>
-                <TooltipTrigger asChild>
-                    {trigger}
-                </TooltipTrigger>
+            <TooltipTrigger asChild>{children}</TooltipTrigger>
                 <TooltipContent
                     align={align}
                     side={side}
