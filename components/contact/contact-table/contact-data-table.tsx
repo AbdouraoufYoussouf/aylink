@@ -30,65 +30,72 @@ import { ContactType } from "@/src/types/contact-type"
 import { getAllContactFilterAction } from "@/actions/contact-action"
 import { useSessionStatus } from "@/hooks/useSessionStatut"
 import { BtnDeleteContact } from "./btn-delete-contact"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationLink, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { getPageRange } from "@/lib/pagination"
 
-interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
+interface DataTableProps {
+    columns: ColumnDef<ContactType, any>[]
     searchPlaceholder?: string
 }
 
 export function ContactDataTable({
-    columns, searchPlaceholder, }: DataTableProps<ContactType, unknown>) {
+    columns,
+    searchPlaceholder,
+}: DataTableProps) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [searchTerm, setSearchTerm] = useState("")
     const { session } = useSessionStatus()
     const [isApplyingSearch, setIsApplyingSearch] = useState(false)
     const [isResetSearch, setIsResetSearch] = useState(false)
+    const [currentPage, setCurrentPage] = useState(0)
+    const [isChangingPage, setIsChangingPage] = useState(false)
 
     const [showPagination, setShowPagination] = useState(true)
     const [lastScrollPosition, setLastScrollPosition] = useState(0)
 
-
     const [total, setTotal] = useState(0)
 
     const { isLoading, data, refetch } = useQuery({
-        queryKey: ['contacts'],
+        queryKey: ['contacts', currentPage, searchTerm],
         queryFn: async () => {
             const res = await getAllContactFilterAction({
                 search: searchTerm,
-                pseudo: session?.user.pseudo
-            })
-            if (res.success === true && res.data) {
-                setTotal(res.total)
-                return res.data
+                pseudo: session?.user.pseudo,
+                pageSize: 50,
+                page: currentPage + 1,
+            });
+            if (res.success === true) {
+                setTotal(res.total);
+                return {
+                    data: res.data as ContactType[],
+                    total: res.total,
+                    currentPage: res.currentPage - 1,
+                    totalPages: res.totalPages,
+                };
             }
-            return []
+            return { data: [] as ContactType[], total: 0, currentPage: 0, totalPages: 0 };
         },
-        enabled: false,
-        staleTime: Infinity,
-        gcTime: Infinity,
-    })
+        enabled: !!session?.user.pseudo,
+        staleTime: 5000,
+    });
 
     const table = useReactTable({
-        data: data || [],
+        data: data?.data ?? [],
         columns,
         onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         state: { sorting },
-        pageCount: Math.ceil((total) / 100),
+        pageCount: data?.totalPages ?? 0,
         manualPagination: true,
-        initialState: {
-            pagination: {
-                pageSize: 50,
-            },
-        }
     })
 
-    const totalPages = Math.ceil((total) / 100)
+    const totalPages = data?.totalPages ?? 0
 
     const handleApplySearch = useCallback(async () => {
         setIsApplyingSearch(true)
+        setCurrentPage(0)
         await refetch()
         setIsApplyingSearch(false)
     }, [refetch])
@@ -96,6 +103,7 @@ export function ContactDataTable({
     const handleClearSearch = useCallback(async () => {
         setIsResetSearch(true)
         setSearchTerm("")
+        setCurrentPage(0)
         await refetch()
         setIsResetSearch(false)
     }, [refetch])
@@ -120,7 +128,14 @@ export function ContactDataTable({
         return () => window.removeEventListener('scroll', handleScroll)
     }, [lastScrollPosition])
 
-    const contactsIds = table.getFilteredSelectedRowModel().rows.map((item) => item.original.id)
+    const handlePageChange = useCallback(async (newPage: number) => {
+        setIsChangingPage(true)
+        setCurrentPage(newPage)
+        await refetch()
+        setIsChangingPage(false)
+    }, [refetch])
+
+    const contactsIds = table.getFilteredSelectedRowModel().rows.map((row) => (row.original as ContactType).id)
 
     return (
         <div className="w-full overflow-auto">
@@ -147,7 +162,9 @@ export function ContactDataTable({
                                 className="absolute left-1 h-7 w-7 top-1 text-muted-foreground"
                             >
                                 {isApplyingSearch ? <Loader2 className="animate-spin" /> :
-                                    <MyTooltipProvider trigger={<Search size={15} />} content={'Lancer la récherche'} />
+                                    <MyTooltipProvider content={'Lancer la récherche'} >
+                                        <Search size={15} />
+                                    </MyTooltipProvider>
                                 }
                             </Button>
                             {
@@ -168,15 +185,11 @@ export function ContactDataTable({
                 </div>
 
                 <div>
-                {
-                        contactsIds.length > 0 ?
-                            <BtnDeleteContact setRowSelection={() => table.setRowSelection({})} contactIdsSelected={contactsIds} /> : null
-                    }
+                    <BtnDeleteContact disabled={contactsIds.length <= 0} setRowSelection={() => table.setRowSelection({})} contactIdsSelected={contactsIds} /> 
                 </div>
-
             </div>
 
-            <div className="rounded-md border">
+            <div className="rounded-md mb-8 border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -196,29 +209,26 @@ export function ContactDataTable({
                     </TableHeader>
                     <TableBody>
                         {
-                            isLoading ? (
+                            isLoading || isChangingPage ? (
                                 <SkeletonRows numRows={25} numCols={columns.length} />
                             ) :
                                 table.getRowModel().rows.length ? (
-                                    table.getRowModel().rows.map((row) => {
-
-                                        return (
-                                            <TableRow
-                                                key={row.id}
-                                                data-state={row.getIsSelected() && "selected"}
-                                                className={` text-sm hover:bg-muted`}
-                                            >
-                                                {row.getVisibleCells().map((cell) => (
-                                                    <TableCell key={cell.id}>
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        )
-                                    })
+                                    table.getRowModel().rows.map((row) => (
+                                        <TableRow
+                                            key={row.id}
+                                            data-state={row.getIsSelected() && "selected"}
+                                            className={`text-sm hover:bg-muted`}
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={columns.length} className="h-24">
+                                        <TableCell colSpan={columns.length} className="h-20">
                                             <div className="flex items-center justify-center h-full">
                                                 <span>Pas de résultats.</span>
                                             </div>
@@ -239,16 +249,51 @@ export function ContactDataTable({
                     )}
                 >
                     <div className="flex w-full py-1 justify-between items-center gap-4">
-                        <div className="text-sm text-muted-foreground ">
+                        <div className="text-sm sm:text-nowrap text-muted-foreground ">
                             {table.getFilteredSelectedRowModel().rows.length} sur{" "}
                             {table.getFilteredRowModel().rows.length} ligne(s) selectionné.
                         </div>
 
-
+                        <Pagination className="">
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
+                                        className={currentPage === 0 ? "pointer-events-none opacity-50" : ""}
+                                    />
+                                </PaginationItem>
+                                {getPageRange(currentPage, totalPages).map((page, index) => (
+                                    <PaginationItem key={index}>
+                                        {page === 'ellipsis' ? (
+                                            <PaginationEllipsis />
+                                        ) : (
+                                            <PaginationLink
+                                                onClick={() => handlePageChange(page)}
+                                                isActive={currentPage === page}
+                                            >
+                                                {page + 1}
+                                            </PaginationLink>
+                                        )}
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={() =>
+                                            handlePageChange(Math.min(totalPages - 1, currentPage + 1))
+                                        }
+                                        className={cn(
+                                            currentPage === totalPages - 1 || (data?.data?.length ?? 0) < 50
+                                                ? "pointer-events-none opacity-50"
+                                                : "cursor-pointer"
+                                        )}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
                     </div>
                 </div>
             )}
-
         </div>
     )
 }
+

@@ -3,7 +3,8 @@
 import { db } from "@/lib/db";
 import { action } from "@/lib/zsa"
 import { contactInfoSchema } from "@/src/shemas/get-contact-info-shema";
-import { ContactType, FilterContactParams } from "@/src/types/contact-type";
+import { ContactResponse, ContactType, FilterContactParams } from "@/src/types/contact-type";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 
@@ -63,50 +64,91 @@ export const saveContactInfosAction = action
 
 
 
-export const getAllContactFilterAction = async (filters: FilterContactParams) => {
-  try {
-    const { search, pseudo } = filters;
 
-    // Trouver l'utilisateur par pseudo
-    const user = await db.user.findUnique({
-      where: { pseudo },
-      include: { contacts: true }, // Charger les contacts liés
-    });
-
-    if (!user) {
-      console.log("Cet utilisateur n'existe pas.");
-      return { success: false, message: "Cet utilisateur n'existe pas." };
+  export const getAllContactFilterAction = async (filters: FilterContactParams): Promise<ContactResponse> => {
+    try {
+      // Validate and sanitize pagination parameters
+      const sanitizedPage = Math.max(1, filters.page || 1); // Ensure page is at least 1
+      const sanitizedPageSize = Math.min(100, Math.max(1, filters.pageSize || 10)); // Ensure pageSize is between 1 and 100
+      const { search, pseudo } = filters;
+  
+      // Find user by pseudo
+      const user = await db.user.findUnique({
+        where: { pseudo },
+        select: { id: true },
+      });
+  
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+          data: [],
+          total: 0,
+          currentPage: sanitizedPage,
+          totalPages: 0,
+        };
+      }
+  
+      // Build where clause for filtering
+      const where: Prisma.ContactWhereInput = {
+        users: {
+          some: {
+            id: user.id,
+          },
+        },
+      };
+  
+      // Add search filter if provided
+      if (search?.trim()) {
+        where.OR = [
+          { name: { contains: search.trim(), mode: "insensitive" } },
+          { email: { contains: search.trim(), mode: "insensitive" } },
+          { country: { contains: search.trim(), mode: "insensitive" } },
+        ];
+      }
+  
+      // Calculate skip and take for pagination
+      const skip = (sanitizedPage - 1) * sanitizedPageSize; // Adjust skip for page index
+      const take = sanitizedPageSize;
+  
+      // Fetch contacts and count in parallel
+      const [contacts, total] = await Promise.all([
+        db.contact.findMany({
+          where,
+          skip,
+          take,
+        }),
+        db.contact.count({ where }),
+      ]);
+  
+      return {
+        success: true,
+        data: contacts.map((contact) => ({
+          id: contact.id,
+          name: contact.name,
+          email: contact.email,
+          location: contact.location ?? "",
+          country: contact.country ?? "",
+          createdAt: contact.createdAt,
+        })),
+        total,
+        currentPage: sanitizedPage,
+        totalPages: Math.ceil(total / sanitizedPageSize), // Calculate total pages
+        message: "Contacts retrieved successfully",
+      };
+    } catch (error) {
+      console.error("Error retrieving contacts:", error);
+      return {
+        success: false,
+        message: "Error retrieving contacts",
+        data: [],
+        total: 0,
+        currentPage: 1,
+        totalPages: 0,
+      };
     }
-
-    // Appliquer des filtres de recherche si nécessaire
-    const filteredContacts = user.contacts.filter((contact) => {
-      if (!search) return true; // Si pas de recherche, inclure tous les contacts
-      return (
-        contact.name.toLowerCase().includes(search.toLowerCase()) ||
-        contact.email.toLowerCase().includes(search.toLowerCase())
-      );
-    });
-
-    // Transformer les données pour le client
-    const response: ContactType[] = filteredContacts.map((contact) => ({
-      id: contact.id,
-      name: contact.name,
-      email: contact.email,
-      location: contact.location ?? "",
-      country: contact.country ?? "",
-    }));
-
-    return {
-      success: true,
-      data: response,
-      total: filteredContacts.length,
-      message: "Contacts récupérés avec succès !",
-    };
-  } catch (error) {
-    console.error("Erreur lors de la récupération des contacts !", error);
-    return { success: false, message: "Erreur lors de la récupération des contacts !" };
-  }
-};
+  };
+  
 
 export const deleteManyContactAction = action
   .input(

@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Block, SubBlock } from "@/types/block";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { SubBlockItem } from "./sub-block-item";
 import { AddSubBlockForm } from "./add-sub-block-form";
+import { Block, SousBlock } from "@/src/types/block-type";
 
 interface BlockCardProps {
   block: Block;
   onUpdateTitle: (blockId: string, newTitle: string) => void;
   onDeleteBlock: (blockId: string) => void;
-  onUpdateSubBlock: (subBlock: SubBlock) => void;
+  onUpdateSubBlock: (subBlock: SousBlock) => void;
   onDeleteSubBlock: (blockId: string, subBlockId: string) => void;
-  onAddSubBlock: (blockId: string, data: Omit<SubBlock, "id" | "blocId">) => void;
+  onAddSubBlock: (blockId: string, data: Omit<SousBlock, "id" | "blocId">) => void;
 }
 
 export function BlockCard({

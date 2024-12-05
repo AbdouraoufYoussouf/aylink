@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { iconReseaux } from "@/src/constants/social-reseaux-data";
 import { SocialLinkType } from "@/src/types/reseaux-type";
-import { updateProfileType, UserProfilType, UserProfilTypeServer } from "@/src/types/user-type";
+import {  UserProfilType } from "@/src/types/user-type";
 
 interface ProfileState {
   user: UserProfilType | null;

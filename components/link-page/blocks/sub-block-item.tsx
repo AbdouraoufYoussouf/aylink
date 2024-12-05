@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Trash2 } from "lucide-react";
 import { ImageUpload } from "./image-upload";
-import { SubBlock } from "@/src/types/block";
+import { SousBlock } from "@/src/types/block-type";
 
 interface SubBlockItemProps {
-  subBlock: SubBlock;
-  onUpdate: (subBlock: SubBlock) => void;
+  subBlock: SousBlock;
+  onUpdate: (subBlock: SousBlock) => void;
   onDelete: () => void;
 }
 

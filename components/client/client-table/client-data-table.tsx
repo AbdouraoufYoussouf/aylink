@@ -90,6 +90,7 @@ export function ClientDataTable({
  
     const handleApplySearch = useCallback(async () => {
         setIsApplyingSearch(true)
+        
         await refetch()
         setIsApplyingSearch(false)
     }, [refetch])
@@ -152,7 +153,9 @@ export function ClientDataTable({
                                 className="absolute left-1 h-7 w-7 top-1 text-muted-foreground"
                             >
                                 {isApplyingSearch ? <Loader2 className="animate-spin" /> :
-                                    <MyTooltipProvider trigger={<Search size={15} />} content={'Lancer la récherche'} />
+                                    <MyTooltipProvider  content={'Lancer la récherche'} >
+                                        <Search size={15} />
+                                    </MyTooltipProvider>
                                 }
                             </Button>
                             {

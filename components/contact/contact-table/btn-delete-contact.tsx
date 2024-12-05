@@ -12,9 +12,10 @@ import React, { useState } from 'react'
 type Props = {
     contactIdsSelected: string[]
     setRowSelection:()=>void
+    disabled:boolean
 }
 
-export const BtnDeleteContact = ({ contactIdsSelected ,setRowSelection}: Props) => {
+export const BtnDeleteContact = ({ contactIdsSelected,disabled ,setRowSelection}: Props) => {
     const [openDeleteAll, setOpenDeleteAll] = useState(false);
     const queryClient = useQueryClient();
 
@@ -58,7 +59,7 @@ export const BtnDeleteContact = ({ contactIdsSelected ,setRowSelection}: Props) 
 
     return (
         <div>
-            <Button
+            <Button disabled={disabled}
                 onClick={() => setOpenDeleteAll(true)}
                 size={'icon'} className="h-8 text-red-400" variant={'outline'}>
                 {

@@ -14,23 +14,23 @@ export function HeaderLink() {
 
     return (
         <header className=" z-30 w-full border-b ">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex h-16 items-center justify-between">
+            <div className=" mx-auto px-4 sm:px-6 ">
+                <div className="flex h-12 items-center justify-between">
                     <nav className="flex items-center space-x-8">
                         {links.map((link) => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`relative px-3 py-2 text-sm font-medium transition-colors ${
+                                className={`relative px-3 pb-1 hover:text-blue-500 text-sm font-medium transition-colors ${
                                     pathname === link.href
-                                        ? "text-yellow-400"
-                                        : "text-yellow-400/70 hover:text-yellow-400"
+                                        ? "text-opacity-100"
+                                        : "text-opacity-50 "
                                 }`}
                             >
                                 {link.label}
                                 {pathname === link.href && (
                                     <motion.div
-                                        className="absolute bottom-0 left-0 h-0.5 w-full bg-white"
+                                        className="absolute bottom-0 left-0 h-0.5 w-full bg-foreground "
                                         layoutId="underline"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}

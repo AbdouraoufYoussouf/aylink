@@ -31,6 +31,7 @@ import { mapSocialLinks } from "@/lib/user-utils"
 import { iconReseaux } from "@/src/constants/social-reseaux-data"
 import { UserProfilType } from "@/src/types/user-type"
 import Image from "next/image"
+import ProfileManagerSkeleton from "./profile-manager-skeleton"
 
 const socialMediaPrefixes: { [key: string]: string } = {
   Twitter: "https://twitter.com/",
@@ -41,7 +42,7 @@ const socialMediaPrefixes: { [key: string]: string } = {
 };
 
 export default function ProfileManager() {
-  const { user, setProfile, removeSocialLink, allSocialLinks, toggleSocialLink, updateSocialLinks } = useProfileStore()
+  const { user, setProfile, removeSocialLink, updateProfile, toggleSocialLink, updateSocialLinks } = useProfileStore()
   const [isAddReseau, setIsAddReseau] = useState(false)
   const [newUsername, setNewUsername] = useState<string>('')
   const [newBio, setNewBio] = useState<string>("")
@@ -63,17 +64,17 @@ export default function ProfileManager() {
       if (session?.user) {
         const response = await getProfilUser(session?.user.id!)
         if (response.success && response.data) {
-          const socialLinks = mapSocialLinks(response.data.socialLinks, iconReseaux);
+          const reseauxSocialLinks = mapSocialLinks(response.data.socialLinks, iconReseaux);
           const profileData: UserProfilType = {
             id: response.data.id,
             pseudo: response.data.pseudo,
             image: response.data.image,
             description: response.data.description,
             banner: response.data.banner,
-            socialLinks
+            socialLinks: reseauxSocialLinks
           }
           setProfile(profileData)
-          setSocialLinks(socialLinks)
+          setSocialLinks(reseauxSocialLinks)
           return response.data
         }
       }
@@ -132,7 +133,17 @@ export default function ProfileManager() {
     try {
       const response = await updateProfileAction(formData)
 
-      if (response?.success) {
+      if (response?.success && response.data) {
+        const reseauxSocialLinks = mapSocialLinks(response.data.socialLinks, iconReseaux);
+        const profileData: UserProfilType = {
+          id: response.data.id,
+          pseudo: response.data.pseudo,
+          image: response.data.image,
+          description: response.data.description,
+          banner: response.data.banner,
+          socialLinks: reseauxSocialLinks
+        }
+        updateProfile(profileData)
         setImageFile(null)
         setBannerFile(null)
         setIsEditing(false)
@@ -195,9 +206,18 @@ export default function ProfileManager() {
     setSocialLinks(user?.socialLinks!)
   }, [user])
 
+  if (isLoading) {
+    return <ProfileManagerSkeleton />
+  }
+
+
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="w-full max-w-3xl py-4 relative flex items-center justify-center overflow-hidden">
-      <header className="absolute top-5 right-0 z-10 m-2">
+    <div className="w-full max-w-3xl rounded-lg relative flex items-center justify-center overflow-hidden">
+      <header className="absolute top-1 -right-1 z-10 m-2">
         {isEditing ? (
           <div className="flex space-x-2">
             <MyTooltipProvider content="Enregistrer les modifications">
@@ -241,7 +261,7 @@ export default function ProfileManager() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full  shadow-xl overflow-hidden"
+            className="w-full  shadow-xl rounded-md overflow-hidden"
           >
             <div className="relative h-40">
               {
@@ -330,7 +350,6 @@ export default function ProfileManager() {
               </div>
             </div>
           </motion.div>
-
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -398,7 +417,7 @@ export default function ProfileManager() {
               </motion.div>
             )}
           </motion.div>
-          <AddReseauSocialModal  handleAddSocial={handleAddSocialLinks} isOpen={isAddReseau} onClose={() => setIsAddReseau(false)} />
+          <AddReseauSocialModal handleAddSocial={handleAddSocialLinks} isOpen={isAddReseau} onClose={() => setIsAddReseau(false)} />
         </CardContent>
       </Card>
 

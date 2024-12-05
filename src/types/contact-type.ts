@@ -8,5 +8,16 @@ export interface ContactType {
 
 export interface FilterContactParams {
     search?: string;
-    pseudo?: string
+    pseudo?: string;
+    page: number;
+    pageSize: number;
+}
+
+export interface ContactResponse {
+    success: boolean;
+    message: string;
+    data: ContactType[];
+    total: number;
+    currentPage: number;
+    totalPages?: number;
 }
