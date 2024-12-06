@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -62,7 +63,7 @@ export default function ProfileManager() {
     queryKey: ['userProfile'],
     queryFn: async () => {
       if (session?.user) {
-        const response = await getProfilUser(session?.user.id!)
+        const response = await getProfilUser(session?.user.id)
         if (response.success && response.data) {
           const reseauxSocialLinks = mapSocialLinks(response.data.socialLinks, iconReseaux);
           const profileData: UserProfilType = {
@@ -158,12 +159,27 @@ export default function ProfileManager() {
   }
 
   const handleCancelEdit = () => {
-    setNewUsername(user?.pseudo!)
-    setNewBio(user?.description!)
-    setNewImage(user?.image!)
-    setNewBanner(user?.banner!)
+    if (user?.pseudo) {
+      setNewUsername(user?.pseudo)
+    }
+    if (user?.description) {
+
+      setNewBio(user?.description)
+    }
+    if (user?.image) {
+      setNewImage(user?.image)
+
+    }
+    if (user?.banner) {
+
+      setNewBanner(user?.banner)
+    }
+    if (user?.socialLinks) {
+
+      setSocialLinks(user?.socialLinks)
+    }
+
     setIsEditing(false)
-    setSocialLinks(user?.socialLinks!)
   }
 
   const handleSocialLinkChange = (name: string, value: string) => {
@@ -199,11 +215,25 @@ export default function ProfileManager() {
   }, [])
 
   useEffect(() => {
-    setNewUsername(user?.pseudo!)
-    setNewBio(user?.description!)
-    setNewImage(user?.image!)
-    setNewBanner(user?.banner!)
-    setSocialLinks(user?.socialLinks!)
+    if (user?.pseudo) {
+      setNewUsername(user?.pseudo)
+    }
+    if (user?.description) {
+
+      setNewBio(user?.description)
+    }
+    if (user?.image) {
+      setNewImage(user?.image)
+
+    }
+    if (user?.banner) {
+
+      setNewBanner(user?.banner)
+    }
+    if (user?.socialLinks) {
+
+      setSocialLinks(user?.socialLinks)
+    }
   }, [user])
 
   if (isLoading) {

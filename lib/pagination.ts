@@ -3,7 +3,7 @@ export function getPageRange(currentPage: number, totalPages: number, maxVisible
     const pages: (number | 'ellipsis')[] = [0];
     
     let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages - 2, start + maxVisible - 3);
+    const end = Math.min(totalPages - 2, start + maxVisible - 3);
     
     // Adjust start if end is too close to totalPages
     start = Math.max(1, Math.min(start, totalPages - maxVisible + 1));
