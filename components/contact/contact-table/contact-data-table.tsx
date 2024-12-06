@@ -138,13 +138,13 @@ export function ContactDataTable({
     const contactsIds = table.getFilteredSelectedRowModel().rows.map((row) => (row.original as ContactType).id)
 
     return (
-        <div className="w-full overflow-auto">
+        <div className="w-full  overflow-auto">
             <div className="flex items-center justify-between w-full mb-4">
                 <div className="flex gap-2 ">
                     <h1 className="font-bold text-nowrap border text-center flex items-center px-2 rounded-md">Total : {total}</h1>
                     <div className="relative w-full">
                         <Input
-                            placeholder={searchPlaceholder ?? "Recherche par nom ou email"}
+                            placeholder={searchPlaceholder ?? "Recherche par nom ou email ou pays"}
                             value={searchTerm}
                             onChange={(event) => setSearchTerm(event.target.value)}
                             className="pr-8 pl-8 min-w-[300px]"
@@ -249,7 +249,7 @@ export function ContactDataTable({
                     )}
                 >
                     <div className="flex w-full py-1 justify-between items-center gap-4">
-                        <div className="text-sm sm:text-nowrap text-muted-foreground ">
+                        <div className="hidden sm:flex text-sm sm:text-nowrap text-muted-foreground ">
                             {table.getFilteredSelectedRowModel().rows.length} sur{" "}
                             {table.getFilteredRowModel().rows.length} ligne(s) selectionné.
                         </div>

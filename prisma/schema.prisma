@@ -37,7 +37,7 @@ model User {
 
   accounts    Account[]
   socialLinks SocialLink[]
-  categories  Category[]
+  blocs       Bloc[]
 
   contacts Contact[] @relation("UserContacts")
 }
@@ -55,28 +55,54 @@ model SocialLink {
   @@unique([userId, name])
 }
 
-model Category {
-  id        String    @id @default(cuid())
-  name      String
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  blocks    Block[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+enum SubBlocType {
+  URL
+  IMAGE
+  DOCUMENT
+  VIDEO
 }
 
-model Block {
-  id          String   @id @default(cuid())
+model Bloc {
+  id        String     @id @default(cuid())
+  name      String
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  subBlocks SubBlock[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime?  @updatedAt
+}
+
+model SubBlock {
+  id          String      @id @default(cuid())
+  type        SubBlocType
   title       String
   description String
-  link        String
-  image       String
-  visitCount  Int      @default(0)
-  isPrivate   Boolean  @default(false)
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isPrivate   Boolean     @default(false)
+  isDisplay   Boolean     @default(true)
+  isPaid      Boolean     @default(false)
+  visitCount  Int         @default(0)
+  blocId      String
+  bloc        Bloc        @relation(fields: [blocId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Common fields for all types
+  url         String?
+
+  // Fields for IMAGE type
+  imageUrl    String?
+  altText     String?
+
+  // Fields for DOCUMENT type
+  documentUrl String?
+  fileType    String?
+  fileSize    Int?
+
+  // Fields for VIDEO type
+  videoUrl     String?
+  thumbnailUrl String?
+  duration     Int?
+  embedCode    String?
 }
 
 model Account {

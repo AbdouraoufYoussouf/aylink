@@ -284,7 +284,7 @@ export default function ProfileManager() {
           </MyTooltipProvider>
         )}
       </header>
-      <Card className="w-full mt-2 relative backdrop-blur-lg shadow-2xl overflow-hidden">
+      <Card className="w-full relative backdrop-blur-lg shadow-2xl overflow-hidden">
 
         <CardContent className="p-2 sm:p-8 md:p-10">
           <motion.div

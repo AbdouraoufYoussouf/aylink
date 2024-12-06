@@ -28,7 +28,7 @@ export const Navbar = () => {
               <Button variant="outline" className="mr-2">Login</Button>
             </Link>
             <Link href={'/auth/register'}>
-            <Button>Register</Button>
+              <Button>Register</Button>
             </Link>
           </div>
           <div className="md:hidden">
@@ -55,8 +55,12 @@ export const Navbar = () => {
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
             <div className="px-2 space-y-1">
-              <Button variant="outline" className="w-full mb-2">Login</Button>
-              <Button className="w-full">Register</Button>
+              <Link href={'/auth/login'}>
+                <Button variant="outline" className="mr-2">Login</Button>
+              </Link>
+              <Link href={'/auth/register'}>
+                <Button>Register</Button>
+              </Link>
             </div>
           </div>
         </div>

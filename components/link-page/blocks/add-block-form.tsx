@@ -223,7 +223,7 @@ export function AddBlocComponent({ setIsAddBloc }: AddBlocComponentProps) {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => append({ id: uuidv4(), title: "", imageUrl: '', imageFile: undefined, imageName: "", description: "", url: "" })}
+              onClick={() => append({ id: uuidv4(), title: "", imageUrl: '', imageFile: undefined, imageName: "", description: "", url: "",isDisplay:true,isPrivate:false })}
             >
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un sous-bloc

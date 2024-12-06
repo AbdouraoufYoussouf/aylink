@@ -16,8 +16,8 @@ const DashboardContent = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className='w-full'>
             <header className={cn(
-                "flex bg-background fixed z-50 border-b justify-between h-16 items-center gap-2 transition-all duration-300 ease-in-out",
-                open ? "left-[16rem] right-0" : "left-0 right-0"
+                "flex  bg-background fixed z-50 md:left-[3rem]  border-b justify-between h-16 items-center gap-2 transition-all duration-300 ease-in-out",
+                open ? "md:left-[16rem] left-0 right-0" : "left-0 right-0"
             )}>
                 <div className="flex items-center gap-2 px-4">
                     <SidebarTrigger className="-ml-1" />
@@ -26,8 +26,7 @@ const DashboardContent = ({ children }: { children: React.ReactNode }) => {
                 <HeaderDashboard />
             </header>
             <main className={cn(
-                "mt-12 p-4 transition-all duration-300 ease-in-out",
-                
+                "mt-12 pt-4 md:p-4 transition-all duration-300 ease-in-out",
             )}>
                 {children}
             </main>

@@ -14,7 +14,7 @@ export default function ProfileManagerSkeleton() {
   const [isEditing, setIsEditing] = useState(false)
 
   return (
-    <div className="w-full max-w-3xl py-4 relative flex items-center justify-center overflow-hidden">
+    <div className="w-full max-w-3xl  relative flex items-center justify-center overflow-hidden">
       <header className="absolute top-5 right-0 z-10 m-2">
         <MyTooltipProvider content="Modifier le profil">
           <Button
@@ -27,7 +27,7 @@ export default function ProfileManagerSkeleton() {
           </Button>
         </MyTooltipProvider>
       </header>
-      <Card className="w-full mt-2 relative backdrop-blur-lg shadow-2xl overflow-hidden">
+      <Card className="w-full  relative backdrop-blur-lg shadow-2xl overflow-hidden">
         <CardContent className="p-2 sm:p-8 md:p-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

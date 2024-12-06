@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -13,9 +14,9 @@ export function HeaderLink() {
     ]
 
     return (
-        <header className=" z-30 w-full border-b ">
+        <header className=" z-30 w-full border rounded-md ">
             <div className=" mx-auto px-4 sm:px-6 ">
-                <div className="flex h-12 items-center justify-between">
+                <div className="flex h-8 items-center justify-between">
                     <nav className="flex items-center space-x-8">
                         {links.map((link) => (
                             <Link

@@ -3,30 +3,17 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trash2, Edit, Plus, Edit2 } from 'lucide-react'
+import { Trash2, Edit, Plus, Edit2, MoreHorizontal, Lock, Unlock, Eye, EyeOff } from 'lucide-react'
 import { AddSousBlock } from "./add-sousblock"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BlockType, CreateSousBlockType } from "@/src/types/block-type"
 import { AddBlocComponent } from "./add-block-form"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Switch } from "@/components/ui/switch"
+import initialBlocs from "./bloc-data"
 
 // Données statiques pour l'exemple
-const initialBlocs: BlockType[] = [
-  {
-    id: "1",
-    title: "Bloc 1",
-    subBlocks: [
-      { id: "1-1", title: "Hmrenov26 le pvc et alu", imageUrl: "https://github.com/shadcn.png", description: "Cobara Kai saison 6 Mon canal télélegram Je vous partage mes passions, mes astuces et mes conseils en business.", url: "https://example.com/1" },
-      { id: "1-2", title: "Hmrenov26 le pvc et alu", imageUrl: "https://github.com/shadcn.png", description: "Description 2", url: "https://example.com/2" },
-    ],
-  },
-  {
-    id: "2",
-    title: "Bloc 2",
-    subBlocks: [
-      { id: "2-1", title: "Hmrenov26 le pvc et alu", imageUrl: "https://github.com/shadcn.png", description: "Description 3", url: "https://example.com/3" },
-    ],
-  },
-]
+
 
 export function BlocksManager() {
   const [blocs, setBlocs] = useState<BlockType[]>(initialBlocs)
@@ -52,12 +39,14 @@ export function BlocksManager() {
         description: formData.get(`subBlocks[${i}][description]`) as string,
         url: formData.get(`subBlocks[${i}][url]`) as string,
         imageUrl: URL.createObjectURL(formData.get(`subBlocks[${i}][image]`) as File),
+        isPrivate: formData.get(`subBlocks[${i}][isPrivate]`) as unknown as boolean,
+        isDisplay: formData.get(`subBlocks[${i}][isDisplay]`) as unknown as boolean
       }
       newBloc.subBlocks.push(subBlock)
     }
 
     setBlocs([...blocs, newBloc])
-   
+
     setIsAddBloc(false)
   }
 
@@ -75,13 +64,39 @@ export function BlocksManager() {
     setBlocs(blocs.filter(bloc => bloc.id !== blocId))
   }
 
-  // const handleDeleteSousBloc = (blocId: string, sousBlocId: string) => {
-  //   setBlocs(blocs.map(bloc =>
-  //     bloc.id === blocId
-  //       ? { ...bloc, subBlocks: bloc.subBlocks.filter(sb => sb.id !== sousBlocId) }
-  //       : bloc
-  //   ))
-  // }
+  const handleDeleteSousBloc = (blocId: string, sousBlocId: string) => {
+    setBlocs(blocs.map(bloc =>
+      bloc.id === blocId
+        ? { ...bloc, subBlocks: bloc.subBlocks.filter(sb => sb.id !== sousBlocId) }
+        : bloc
+    ))
+  }
+
+  const handleToggleVisibility = (blocId: string, sousBlocId: string, isPrivate: boolean) => {
+    setBlocs(blocs.map(bloc =>
+      bloc.id === blocId
+        ? {
+          ...bloc,
+          subBlocks: bloc.subBlocks.map(sb =>
+            sb.id === sousBlocId ? { ...sb, isPrivate } : sb
+          )
+        }
+        : bloc
+    ))
+  }
+
+  const handleTogglePrivacy = (blocId: string, sousBlocId: string, isPrivate: boolean) => {
+    setBlocs(blocs.map(bloc =>
+      bloc.id === blocId
+        ? {
+          ...bloc,
+          subBlocks: bloc.subBlocks.map(sb =>
+            sb.id === sousBlocId ? { ...sb, isPrivate } : sb
+          )
+        }
+        : bloc
+    ))
+  }
 
   return (
     <div className="space-y-4">
@@ -106,7 +121,7 @@ export function BlocksManager() {
                 <div key={sousBloc.id} className="flex relative gap-2 border rounded-lg p-2 items-center  mb-2">
                   <div className="">
                     <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
-                      <AvatarImage src={sousBloc.imageUrl} />
+                      <AvatarImage className="rounded" src={sousBloc.imageUrl} />
                       <AvatarFallback>SB</AvatarFallback>
                     </Avatar>
                   </div>
@@ -115,15 +130,55 @@ export function BlocksManager() {
                     <span className="text-sm text-muted-foreground leading-4">{sousBloc.description}</span>
                   </div>
                   <div className="absolute right-1 top-1">
-                    <Button variant="outline" className="h-7 w-7 bg-accent" size="icon">
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => {/* Handle edit action */ }}>
+                          <Edit2 className="mr-2 h-4 w-4" />
+                          <span>Modifier</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <div className="flex items-center">
+                            {sousBloc.isPrivate ? <Lock className="mr-2 h-4 w-4" /> : <Unlock className="mr-2 h-4 w-4" />}
+                            <span>Accès privé</span>
+                            <Switch
+                              className="ml-2"
+                              checked={sousBloc.isPrivate}
+                              onCheckedChange={(checked) => handleTogglePrivacy(bloc.id, sousBloc.id, checked)}
+                            />
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                          <div className="flex items-center justify-between w-full" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex  justify-end items-end">
+                              {sousBloc.isPrivate ? <Eye className="mr-2 h-4 w-4" /> : <EyeOff className="mr-2 h-4 w-4" />}
+
+                              <span>Visibilité</span>
+                            </div>
+                            <Switch
+                              className="ml-2"
+                              checked={sousBloc.isPrivate}
+                              onCheckedChange={(checked) => handleToggleVisibility(bloc.id, sousBloc.id, checked)}
+                            />
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleDeleteSousBloc(bloc.id, sousBloc.id)} className="text-red-600">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>Supprimer</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               ))}
 
             </div>
-          
+
 
             {isAddSousBloc && currentBlocId === bloc.id && (
               <AddSousBlock
@@ -139,13 +194,13 @@ export function BlocksManager() {
           </CardContent>
         </Card>
       ))}
-          {isAddBloc && (
-                <AddBlocComponent
-                  isAddBloc={isAddBloc}
-                  setIsAddBloc={setIsAddBloc}
-                  onAddBloc={handleAddBloc}
-                />
-              )}
+      {isAddBloc && (
+        <AddBlocComponent
+          isAddBloc={isAddBloc}
+          setIsAddBloc={setIsAddBloc}
+          onAddBloc={handleAddBloc}
+        />
+      )}
       <Button onClick={() => setIsAddBloc(true)}>
         <Plus className="mr-2 h-4 w-4" /> Ajouter un bloc
       </Button>

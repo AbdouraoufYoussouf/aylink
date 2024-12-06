@@ -22,8 +22,7 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
     //     // console.log({ user, account })
     //     if (!data?.emailVerified) {
     //       return false;
-    //     }
-    
+    //     } 
     //     return true;
     //   } catch (error) {
     //     console.error("Error in signIn function:", error);

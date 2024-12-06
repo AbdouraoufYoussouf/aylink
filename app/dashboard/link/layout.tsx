@@ -9,7 +9,7 @@ export default function RootLayout({
     return (
         <PageContainer>
             <HeaderLink />
-            <main>{children}</main>
+            <main className="mt-2">{children}</main>
         </PageContainer>
     )
 }
