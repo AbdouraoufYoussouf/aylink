@@ -34,7 +34,7 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationLink, Pagi
 import { getPageRange } from "@/lib/pagination"
 
 interface DataTableProps {
-    columns: ColumnDef<ContactType, any>[]
+    columns: ColumnDef<ContactType, unknown>[]
     searchPlaceholder?: string
 }
 

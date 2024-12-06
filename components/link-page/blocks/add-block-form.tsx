@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 
 import { useState } from "react"
@@ -15,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { X, Plus, Trash2, Camera } from 'lucide-react'
+import { X, Plus, Camera } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AutoResizeTextarea } from "@/components/auto-rezise-textarea"
 import ImageCropper from "@/components/image-cropper"
@@ -34,7 +35,7 @@ interface AddBlocComponentProps {
   onAddBloc: (formData: FormData) => void
 }
 
-export function AddBlocComponent({ isAddBloc, setIsAddBloc, onAddBloc }: AddBlocComponentProps) {
+export function AddBlocComponent({ setIsAddBloc }: AddBlocComponentProps) {
   const [isCropping, setIsCropping] = useState(false)
   const [tempImageUrl, setTempImageUrl] = useState<string | null>(null)
   const [currentEditingIndex, setCurrentEditingIndex] = useState<number | null>(null)
@@ -44,7 +45,9 @@ export function AddBlocComponent({ isAddBloc, setIsAddBloc, onAddBloc }: AddBloc
     defaultValues: {
       id: uuidv4(),
       title: "",
-      subBlocks: [{ id: uuidv4(), title: "", image: null, description: "", url: "" }],
+      subBlocks: [
+        { id: uuidv4(), title: "", imageFile: undefined, imageUrl: "", imageName: "", description: "", url: "" },
+      ],
     },
   })
 
@@ -52,25 +55,6 @@ export function AddBlocComponent({ isAddBloc, setIsAddBloc, onAddBloc }: AddBloc
     control: form.control,
     name: "subBlocks",
   })
-
-  const onSubmit = (data: BlockType) => {
-    const formData = new FormData()
-    formData.append("id", data.id)
-    formData.append("title", data.title)
-
-    data.subBlocks.forEach((subBlock, index) => {
-      formData.append(`subBlocks[${index}][id]`, subBlock.id)
-      formData.append(`subBlocks[${index}][title]`, subBlock.title)
-      formData.append(`subBlocks[${index}][description]`, subBlock.description)
-      formData.append(`subBlocks[${index}][url]`, subBlock.url)
-      if (subBlock.image) {
-        formData.append(`subBlocks[${index}][image]`, subBlock.image)
-      }
-    })
-
-    onAddBloc(formData)
-    form.reset()
-  }
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = event.target.files?.[0]
@@ -84,16 +68,41 @@ export function AddBlocComponent({ isAddBloc, setIsAddBloc, onAddBloc }: AddBloc
 
   const handleCropComplete = async (croppedImageBlob: Blob) => {
     if (currentEditingIndex !== null) {
-      const file = new File([croppedImageBlob], 'sous-bloc-image.jpg', { type: 'image/jpeg' })
-      form.setValue(`subBlocks.${currentEditingIndex}.image`, file)
+      const file = new File([croppedImageBlob], 'cropped-image.jpg', { type: 'image/jpeg' })
+      const imageUrl = URL.createObjectURL(file)
+
+      // Met à jour les champs dans le formulaire
+      form.setValue(`subBlocks.${currentEditingIndex}.imageFile`, file)
+      form.setValue(`subBlocks.${currentEditingIndex}.imageUrl`, imageUrl)
+      form.setValue(`subBlocks.${currentEditingIndex}.imageName`, file.name)
+
       setIsCropping(false)
       setTempImageUrl(null)
       setCurrentEditingIndex(null)
     }
   }
 
+  const onSubmit = (data: BlockType) => {
+    const formData = new FormData()
+    formData.append("id", data.id)
+    formData.append("title", data.title)
+
+    data.subBlocks.forEach((subBlock, index) => {
+      formData.append(`subBlocks[${index}][id]`, subBlock.id)
+      formData.append(`subBlocks[${index}][title]`, subBlock.title)
+      formData.append(`subBlocks[${index}][description]`, subBlock.description)
+      formData.append(`subBlocks[${index}][url]`, subBlock.url)
+      if (subBlock.imageFile) {
+        formData.append(`subBlocks[${index}][imageFile]`, subBlock.imageFile)
+      }
+    })
+    console.log('bloc:',formData)
+    // onAddBloc(formData):
+  }
+
+
   return (
-    <Card className="max-w-3xl mx-auto">
+    <Card className="w-full mx-auto">
       <CardHeader className="px-4 py-2">
         <CardTitle className="flex text-center relative items-center justify-center mt-2">
           Ajouter un bloc
@@ -118,107 +127,108 @@ export function AddBlocComponent({ isAddBloc, setIsAddBloc, onAddBloc }: AddBloc
                 </FormItem>
               )}
             />
-            
-            {fields.map((field, index) => (
-              <Card key={field.id} className="p-4">
-                <CardTitle className="text-lg mb-4">Sous-bloc {index + 1}</CardTitle>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name={`subBlocks.${index}.title`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Titre du sous-bloc</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Titre du sous-bloc" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`subBlocks.${index}.url`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>URL du sous-bloc</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex w-full gap-2 lg:gap-4">
+            <div className="grid lg:grid-cols-2 gap-3 w-full">
+              {fields.map((field, index) => (
+                <Card key={field.id} className="p-4 relative ">
+                  <CardTitle className="text-lg mb-4">Sous-bloc {index + 1}</CardTitle>
+                  <div className="space-y-4">
                     <FormField
                       control={form.control}
-                      name={`subBlocks.${index}.image`}
-                      render={({ field: { value, onChange, ...field } }) => (
-                        <FormItem>
-                          <FormLabel htmlFor={`image-upload-${index}`} className="cursor-pointer">
-                            <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
-                              <AvatarImage src={value ? URL.createObjectURL(value) : undefined} />
-                              <AvatarFallback>
-                                <Camera className="w-8 h-8 text-muted-foreground" />
-                              </AvatarFallback>
-                            </Avatar>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              id={`image-upload-${index}`}
-                              type="file"
-                              className="hidden"
-                              accept="image/*"
-                              onChange={(e) => handleImageUpload(e, index)}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`subBlocks.${index}.description`}
+                      name={`subBlocks.${index}.title`}
                       render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel>Description</FormLabel>
+                        <FormItem>
+                          <FormLabel>Titre du sous-bloc</FormLabel>
                           <FormControl>
-                            <AutoResizeTextarea
-                              {...field}
-                              className="w-full resize-none text-sm text-muted-foreground leading-4 text-justify"
-                            />
+                            <Input placeholder="Titre du sous-bloc" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name={`subBlocks.${index}.url`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>URL du sous-bloc</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://example.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex w-full gap-2 lg:gap-4">
+
+                      <FormField
+                        control={form.control}
+                        name={`subBlocks.${index}.imageFile`}
+                        render={() => (
+                          <FormItem>
+                            <FormLabel htmlFor={`image-upload-${index}`} className="cursor-pointer">
+                              <Avatar className="w-20 h-20">
+                                <AvatarImage src={form.getValues(`subBlocks.${index}.imageUrl`) || ""} />
+                                <AvatarFallback>
+                                  <Camera className="w-8 h-8 text-muted-foreground" />
+                                </AvatarFallback>
+                              </Avatar>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                id={`image-upload-${index}`}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleImageUpload(e, index)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`subBlocks.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <AutoResizeTextarea
+                                {...field}
+                                className="w-full resize-none text-sm text-muted-foreground leading-4 text-justify"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {index > 0 && (
+                      <Button  
+                      className="absolute  w-7 h-7 flex items-center justify-center -top-2 right-2"
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => remove(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
-                  {index > 0 && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Supprimer ce sous-bloc
-                    </Button>
-                  )}
-                </div>
-              </Card>
-            ))}
-            
+                </Card>
+              ))}
+            </div>
+
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => append({ id: uuidv4(), title: "", image: null, description: "", url: "" })}
+              onClick={() => append({ id: uuidv4(), title: "", imageUrl: '', imageFile: undefined, imageName: "", description: "", url: "" })}
             >
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un sous-bloc
             </Button>
-            
+
             <Button type="submit" className="w-full">Sauvegarder le bloc</Button>
           </form>
         </Form>

@@ -129,7 +129,7 @@ export function Pricing() {
   const [isYearly, setIsYearly] = useState(false)
 
   return (
-    <section className="py-24 bg-gradient-to-br from-white to-gray-50">
+    <section id={'pricing'} className="py-24 bg-gradient-to-br from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <motion.div

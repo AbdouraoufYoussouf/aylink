@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trash2, Edit, Plus, Camera, Edit2 } from 'lucide-react'
+import { Trash2, Edit, Plus, Edit2 } from 'lucide-react'
 import { AddSousBlock } from "./add-sousblock"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BlockType, CreateSousBlockType } from "@/src/types/block-type"
@@ -15,15 +15,15 @@ const initialBlocs: BlockType[] = [
     id: "1",
     title: "Bloc 1",
     subBlocks: [
-      { id: "1-1", title: "Hmrenov26 le pvc et alu", image: "https://github.com/shadcn.png", description: "Cobara Kai saison 6 Mon canal télélegram Je vous partage mes passions, mes astuces et mes conseils en business.", url: "https://example.com/1" },
-      { id: "1-2", title: "Hmrenov26 le pvc et alu", image: "https://github.com/shadcn.png", description: "Description 2", url: "https://example.com/2" },
+      { id: "1-1", title: "Hmrenov26 le pvc et alu", imageUrl: "https://github.com/shadcn.png", description: "Cobara Kai saison 6 Mon canal télélegram Je vous partage mes passions, mes astuces et mes conseils en business.", url: "https://example.com/1" },
+      { id: "1-2", title: "Hmrenov26 le pvc et alu", imageUrl: "https://github.com/shadcn.png", description: "Description 2", url: "https://example.com/2" },
     ],
   },
   {
     id: "2",
     title: "Bloc 2",
     subBlocks: [
-      { id: "2-1", title: "Hmrenov26 le pvc et alu", image: "https://github.com/shadcn.png", description: "Description 3", url: "https://example.com/3" },
+      { id: "2-1", title: "Hmrenov26 le pvc et alu", imageUrl: "https://github.com/shadcn.png", description: "Description 3", url: "https://example.com/3" },
     ],
   },
 ]
@@ -51,12 +51,13 @@ export function BlocksManager() {
         title: formData.get(`subBlocks[${i}][title]`) as string,
         description: formData.get(`subBlocks[${i}][description]`) as string,
         url: formData.get(`subBlocks[${i}][url]`) as string,
-        image: URL.createObjectURL(formData.get(`subBlocks[${i}][image]`) as File),
+        imageUrl: URL.createObjectURL(formData.get(`subBlocks[${i}][image]`) as File),
       }
       newBloc.subBlocks.push(subBlock)
     }
 
     setBlocs([...blocs, newBloc])
+   
     setIsAddBloc(false)
   }
 
@@ -74,13 +75,13 @@ export function BlocksManager() {
     setBlocs(blocs.filter(bloc => bloc.id !== blocId))
   }
 
-  const handleDeleteSousBloc = (blocId: string, sousBlocId: string) => {
-    setBlocs(blocs.map(bloc =>
-      bloc.id === blocId
-        ? { ...bloc, subBlocks: bloc.subBlocks.filter(sb => sb.id !== sousBlocId) }
-        : bloc
-    ))
-  }
+  // const handleDeleteSousBloc = (blocId: string, sousBlocId: string) => {
+  //   setBlocs(blocs.map(bloc =>
+  //     bloc.id === blocId
+  //       ? { ...bloc, subBlocks: bloc.subBlocks.filter(sb => sb.id !== sousBlocId) }
+  //       : bloc
+  //   ))
+  // }
 
   return (
     <div className="space-y-4">
@@ -105,7 +106,7 @@ export function BlocksManager() {
                 <div key={sousBloc.id} className="flex relative gap-2 border rounded-lg p-2 items-center  mb-2">
                   <div className="">
                     <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
-                      <AvatarImage src={sousBloc.image} />
+                      <AvatarImage src={sousBloc.imageUrl} />
                       <AvatarFallback>SB</AvatarFallback>
                     </Avatar>
                   </div>
@@ -120,8 +121,10 @@ export function BlocksManager() {
                   </div>
                 </div>
               ))}
+
             </div>
-            
+          
+
             {isAddSousBloc && currentBlocId === bloc.id && (
               <AddSousBlock
                 blocId={currentBlocId}
@@ -136,16 +139,17 @@ export function BlocksManager() {
           </CardContent>
         </Card>
       ))}
+          {isAddBloc && (
+                <AddBlocComponent
+                  isAddBloc={isAddBloc}
+                  setIsAddBloc={setIsAddBloc}
+                  onAddBloc={handleAddBloc}
+                />
+              )}
       <Button onClick={() => setIsAddBloc(true)}>
         <Plus className="mr-2 h-4 w-4" /> Ajouter un bloc
       </Button>
-      {isAddBloc && (
-        <AddBlocComponent
-          isAddBloc={isAddBloc}
-          setIsAddBloc={setIsAddBloc}
-          onAddBloc={handleAddBloc}
-        />
-      )}
+
     </div>
   )
 }

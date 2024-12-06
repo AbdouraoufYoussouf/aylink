@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 
 import { useState } from "react"
@@ -35,7 +36,7 @@ interface AddSousBlocProps {
   onAddSousBloc: (blocId: string, sousBloc: CreateSousBlockType) => void
 }
 
-export function AddSousBlock({ blocId, isAddSousBloc, setIsAddSousBloc, onAddSousBloc }: AddSousBlocProps) {
+export function AddSousBlock({ setIsAddSousBloc }: AddSousBlocProps) {
   const [isCropping, setIsCropping] = useState(false)
   const [tempImageUrl, setTempImageUrl] = useState<string | null>(null)
 
@@ -43,29 +44,37 @@ export function AddSousBlock({ blocId, isAddSousBloc, setIsAddSousBloc, onAddSou
     resolver: zodResolver(createSousBlocSchema),
     defaultValues: {
       id: uuidv4(),
-      image: null,
+      imageFile: undefined,
+      title: "",
       description: "",
       url: "",
+      imageName: "",
     },
   })
 
   const onSubmit = (data: CreateSousBlockType) => {
-    onAddSousBloc(blocId, data)
-    form.reset()
+    // onAddSousBloc(blocId, data)
+    console.log("sous bloc", data)
+    // form.reset()
   }
+
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      const imageUrl = URL.createObjectURL(file)
-      setTempImageUrl(imageUrl)
+      const urlImage = URL.createObjectURL(file)
+      form.setValue("imageName", file.name);
+      setTempImageUrl(urlImage)
       setIsCropping(true)
     }
   }
 
   const handleCropComplete = async (croppedImageBlob: Blob) => {
-    const file = new File([croppedImageBlob], 'sous-bloc-image.jpg', { type: 'image/jpeg' })
-    form.setValue('image', file)
+    const nameImage = form.getValues("imageName");
+    const file = new File([croppedImageBlob], nameImage ? nameImage : "sous-bloc-image.jpg", { type: 'image/jpeg' })
+    const urlImage = URL.createObjectURL(file)
+    form.setValue('imageFile', file)
+    form.setValue("imageUrl", urlImage);
     setIsCropping(false)
     setTempImageUrl(null)
   }
@@ -114,12 +123,12 @@ export function AddSousBlock({ blocId, isAddSousBloc, setIsAddSousBloc, onAddSou
             <div className="flex w-full gap-2 lg:gap-4">
               <FormField
                 control={form.control}
-                name="image"
-                render={({ field: { value, onChange, ...field } }) => (
+                name="imageFile"
+                render={({ }) => (
                   <FormItem>
                     <FormLabel htmlFor="image-upload" className="cursor-pointer">
                       <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
-                        <AvatarImage src={value ? URL.createObjectURL(value) : undefined} />
+                      <AvatarImage src={form.getValues("imageUrl") || ""} />
                         <AvatarFallback>
                           <Camera className="w-8 h-8 text-muted-foreground" />
                         </AvatarFallback>
@@ -131,8 +140,10 @@ export function AddSousBlock({ blocId, isAddSousBloc, setIsAddSousBloc, onAddSou
                         type="file"
                         className="hidden"
                         accept="image/*"
-                        onChange={handleImageUpload}
-                        {...field}
+                        // On ne propage pas `...field`
+                        onChange={(e) => {
+                          handleImageUpload(e) // Gère le fichier
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
