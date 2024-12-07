@@ -32,7 +32,7 @@ const profilData = {
   name: "Rafien",
   description: "💻 Développeur et créateur de contenu, je construis vos sites 🌐 et applications mobiles 📱 et vous accompagne pour lancer un business en ligne 🚀. De React à CapCut 🎥 et l'IA 🤖, je maîtrise tout. Besoin d'aide ? Contactez-moi sur WhatsApp !",
   image: "/rafien.png",
-  banner: "/banier1.png", // Add the path to your banner image here
+  banner: "/baniptv.png", // Add the path to your banner image here
   socialLinks: [
     {
       icon: <FaTiktok className="w-5 h-5 " />,
@@ -173,7 +173,7 @@ export default function UserLinkPreviw({ pseudo }: Props) {
     localStorage.setItem('userInfo', JSON.stringify(newUserInfo))
   }
 
-  if (!isLoading) {
+  if (isLoading) {
     return <UserLinkPreviewSkeleton />
   }
 
@@ -202,14 +202,13 @@ export default function UserLinkPreviw({ pseudo }: Props) {
             alt="Profile"
             width={112}
             height={112}
-            className="w-20 h-20 sm:w-28 sm:h-28 rounded-full mx-auto mb-2 border-4 border-white absolute top-[6rem] left-1/2 shadow-lg  transform -translate-x-1/2"
+            className="w-20 h-20 sm:w-28 sm:h-28 rounded-full mx-auto mb-2 border-4 border-white absolute  top-[5rem]  left-1/2 shadow-lg  transform -translate-x-1/2"
           />
         </div>
-        <div className=" p-2 text-center mt-6 sm:mt-12">
+        <div className=" p-2 text-center mt-6 sm:mt-8">
           <div className="">
-            <h1 className="text-xl font-bold ">{profilData.name}</h1>
+            <h1 className="text-2xl font-bold ">{profilData.name}</h1>
             <p className="text-sm text-muted-foreground leading-4 text-justify mb-4">{profilData.description}</p>
-
             <motion.div
               className="flex justify-center space-x-1 mb-4"
               initial={{ opacity: 0, y: -20 }}

@@ -103,7 +103,16 @@
     border-bottom-left-radius: 0%;
   }
   
- 
+ /* Styles de la barre de défilement avec bords arrondis */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Pour Firefox */
+}
+
+
+
+
+
+
   
 }
 

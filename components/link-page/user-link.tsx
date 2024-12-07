@@ -32,7 +32,7 @@ const profilData = {
   name: "Rafien",
   description: "💻 Développeur et créateur de contenu, je construis vos sites 🌐 et applications mobiles 📱 et vous accompagne pour lancer un business en ligne 🚀. De React à CapCut 🎥 et l'IA 🤖, je maîtrise tout. Besoin d'aide ? Contactez-moi sur WhatsApp !",
   image: "/rafien.png",
-  banner: "/banier1.png", // Add the path to your banner image here
+  banner: "/baniptv.png",
   socialLinks: [
     {
       icon: <FaTiktok className="w-5 h-5 " />,
