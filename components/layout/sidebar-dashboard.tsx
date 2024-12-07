@@ -9,9 +9,13 @@ import {
 } from "@/components/ui/sidebar"
 import { HeaderDashboard } from './header-dashboard'
 import { cn } from "@/lib/utils"
+import { HeaderLink } from '../link-page/header-link'
+import { usePathname } from 'next/navigation'
 
 const DashboardContent = ({ children }: { children: React.ReactNode }) => {
     const { open } = useSidebar()
+    const path = usePathname()
+    console.log(path)
 
     return (
         <div className='w-full'>
@@ -22,6 +26,12 @@ const DashboardContent = ({ children }: { children: React.ReactNode }) => {
                 <div className="flex items-center gap-2 px-4">
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
+                    <div >
+                        {
+                            path.includes('/dashboard/link') &&
+                    <HeaderLink />
+                        }
+                    </div>
                 </div>
                 <HeaderDashboard />
             </header>

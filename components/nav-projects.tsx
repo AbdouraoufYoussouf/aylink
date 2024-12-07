@@ -1,5 +1,9 @@
 import {
-  
+
+  Folder,
+  Forward,
+  MoreHorizontal,
+  Trash2,
   type LucideIcon,
 } from "lucide-react"
 
@@ -7,10 +11,13 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
 
 } from "@/components/ui/sidebar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function NavProjects({
   projects,
@@ -21,10 +28,10 @@ export function NavProjects({
     icon: LucideIcon
   }[]
 }) {
-
+  const isMobile = useIsMobile()
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroupLabel> Menu</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
@@ -34,7 +41,7 @@ export function NavProjects({
                 <span>{item.name}</span>
               </a>
             </SidebarMenuButton>
-            {/* <DropdownMenu>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
@@ -60,7 +67,7 @@ export function NavProjects({
                   <span>Delete Project</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu> */}
+            </DropdownMenu>
           </SidebarMenuItem>
         ))}
         {/* <SidebarMenuItem>

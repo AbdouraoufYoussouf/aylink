@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import {
-  Bot,
+ 
   Command,
   LayoutDashboard,
   Link,
@@ -23,6 +23,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useSessionStatus } from "@/hooks/useSessionStatut"
+import { NavMain } from "./nav-main"
 
 // This is sample data.
 
@@ -36,29 +37,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     navMain: [
       {
-        title: "Mes liens",
-        url: "#",
-        icon: Bot,
+        
+          title: "Ma page in bio",
+          url: "/dashboard/link",
+          icon: Link,
+        
         items: [
           {
-            title: "Ajouter un lien",
-            url: "#",
+            title: "Profil info",
+            url: "/dashboard/link",
           },
           {
-            title: "Explorer",
-            url: "#",
+            title: "Mes blocs",
+            url: "/dashboard/link/bloc",
           },
           {
-            title: "Quantum",
-            url: "#",
+            title: "Desing",
+            url: "/dashboard/link/desing",
           },
         ],
       },
-      {
-        title: "Mes liens",
-        url: "#",
-        icon: Bot,
-      },
+     
       // {
       //   title: "Documentation",
       //   url: "#",
@@ -112,11 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/dashboard",
         icon: LayoutDashboard,
       },
-      {
-        name: "Mes liens",
-        url: "/dashboard/link",
-        icon: Link,
-      },
+    
       {
         name: "Mes contacts",
         url: "/dashboard/contact",
@@ -151,6 +146,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavProjects projects={data.menu} />
+        <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         {

@@ -1,5 +1,6 @@
 import PageContainer from "@/components/layout/page-container"
-import { HeaderLink } from "@/components/link-page/header-link"
+import { IPhoneFrame } from "@/components/preview/iphone-frame"
+import { LinkInBioPreview } from "@/components/preview/link-inbio-preview"
 
 export default function RootLayout({
     children,
@@ -8,8 +9,15 @@ export default function RootLayout({
 }) {
     return (
         <PageContainer>
-            <HeaderLink />
-            <main className="mt-2">{children}</main>
+           
+            <div className="flex flex-col lg:flex-row mt-2 space-y-4 ">
+                <main className="w-full lg:mr-[375px] ">{children}</main>
+                <div className=" flex items-center lg:fixed justify-center lg:right-5">
+                    <IPhoneFrame>
+                        <LinkInBioPreview />
+                    </IPhoneFrame>
+                </div>
+            </div>
         </PageContainer>
     )
 }

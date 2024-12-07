@@ -14,7 +14,7 @@ export function HeaderLink() {
     ]
 
     return (
-        <header className=" z-30 w-full border rounded-md ">
+        <header className=" z-30 w-full  rounded-md ">
             <div className=" mx-auto px-4 sm:px-6 ">
                 <div className="flex h-8 items-center justify-between">
                     <nav className="flex items-center space-x-8">
