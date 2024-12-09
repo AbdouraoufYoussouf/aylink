@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 "use client"
 
@@ -46,7 +47,7 @@ export function AddBlocComponent({ setIsAddBloc }: AddBlocComponentProps) {
       id: uuidv4(),
       title: "",
       subBlocks: [
-        { id: uuidv4(), title: "", imageFile: undefined, imageUrl: "", imageName: "", description: "", url: "" },
+        { id: uuidv4(), title: "", imageFile: undefined, imageUrl: "", description: "", url: "" },
       ],
     },
   })
@@ -74,7 +75,7 @@ export function AddBlocComponent({ setIsAddBloc }: AddBlocComponentProps) {
       // Met à jour les champs dans le formulaire
       form.setValue(`subBlocks.${currentEditingIndex}.imageFile`, file)
       form.setValue(`subBlocks.${currentEditingIndex}.imageUrl`, imageUrl)
-      form.setValue(`subBlocks.${currentEditingIndex}.imageName`, file.name)
+      // form.setValue(`subBlocks.${currentEditingIndex}.imageName`, file.name)
 
       setIsCropping(false)
       setTempImageUrl(null)
@@ -87,15 +88,15 @@ export function AddBlocComponent({ setIsAddBloc }: AddBlocComponentProps) {
     formData.append("id", data.id)
     formData.append("title", data.title)
 
-    data.subBlocks.forEach((subBlock, index) => {
-      formData.append(`subBlocks[${index}][id]`, subBlock.id)
-      formData.append(`subBlocks[${index}][title]`, subBlock.title)
-      formData.append(`subBlocks[${index}][description]`, subBlock.description)
-      formData.append(`subBlocks[${index}][url]`, subBlock.url)
-      if (subBlock.imageFile) {
-        formData.append(`subBlocks[${index}][imageFile]`, subBlock.imageFile)
-      }
-    })
+    // data.subBlocks.forEach((subBlock, index) => {
+    //   formData.append(`subBlocks[${index}][id]`, subBlock.id)
+    //   formData.append(`subBlocks[${index}][title]`, subBlock.title)
+    //   formData.append(`subBlocks[${index}][description]`, subBlock.description)
+    //   formData.append(`subBlocks[${index}][url]`, subBlock.url)
+    //   if (subBlock.imageFile) {
+    //     formData.append(`subBlocks[${index}][imageFile]`, subBlock.imageFile)
+    //   }
+    // })
     console.log('bloc:',formData)
     // onAddBloc(formData):
   }
@@ -219,7 +220,7 @@ export function AddBlocComponent({ setIsAddBloc }: AddBlocComponentProps) {
               ))}
             </div>
 
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               size="sm"
@@ -227,7 +228,7 @@ export function AddBlocComponent({ setIsAddBloc }: AddBlocComponentProps) {
             >
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un sous-bloc
-            </Button>
+            </Button> */}
 
             <Button type="submit" className="w-full">Sauvegarder le bloc</Button>
           </form>

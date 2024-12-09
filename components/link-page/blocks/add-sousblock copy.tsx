@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 "use client"
 
@@ -50,8 +51,7 @@ export function AddSousBlock({ setIsAddSousBloc }: AddSousBlocProps) {
       title: "",
       description: "",
       url: "",
-      imageName: "",
-      isDisplay: false,
+      // isDisplay: false,
       isPrivate: false
     },
   })
@@ -67,20 +67,20 @@ export function AddSousBlock({ setIsAddSousBloc }: AddSousBlocProps) {
     const file = event.target.files?.[0]
     if (file) {
       const urlImage = URL.createObjectURL(file)
-      form.setValue("imageName", file.name);
-      setTempImageUrl(urlImage)
+      // form.setValue("imageName", file.name);
+      // setTempImageUrl(urlImage)
       setIsCropping(true)
     }
   }
 
   const handleCropComplete = async (croppedImageBlob: Blob) => {
-    const nameImage = form.getValues("imageName");
-    const file = new File([croppedImageBlob], nameImage ? nameImage : "sous-bloc-image.jpg", { type: 'image/jpeg' })
-    const urlImage = URL.createObjectURL(file)
-    form.setValue('imageFile', file)
-    form.setValue("imageUrl", urlImage);
-    setIsCropping(false)
-    setTempImageUrl(null)
+    // const nameImage = form.getValues("imageName");
+    // const file = new File([croppedImageBlob], nameImage ? nameImage : "sous-bloc-image.jpg", { type: 'image/jpeg' })
+    // const urlImage = URL.createObjectURL(file)
+    // form.setValue('imageFile', file)
+    // form.setValue("imageUrl", urlImage);
+    // setIsCropping(false)
+    // setTempImageUrl(null)
   }
 
 

@@ -21,3 +21,20 @@ export interface ContactResponse {
     currentPage: number;
     totalPages?: number;
 }
+
+export interface CreateContactType {
+    name: string;
+    email: string;
+    whatsapp?: string;
+    country?: string;
+    location?: string;
+    message?: string;
+    pseudo: string;
+    tag: string;
+    oneYearSubscription?: boolean;
+    deviceType?: string;
+}
+
+
+
+

@@ -4,6 +4,7 @@ import "./globals.css";
 import MyProviders from "@/components/providers/my-provider";
 import { auth } from "@/auth";
 import NextTopLoader from 'nextjs-toploader';
+import { Toaster } from "@/components/ui/toaster";
 
 
 const geistSans = localFont({
@@ -20,6 +21,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Rafien",
   description: "Créateur de contenu et developeur web",
+ 
 };
 
 export default async function RootLayout({
@@ -29,12 +31,13 @@ export default async function RootLayout({
 }>) {
   const session = await auth()
   return (
-    <html lang="en">
+    <html lang="fr">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <NextTopLoader showSpinner={false} />
+        <Toaster />
         <MyProviders session={session}>
           <main>{children}</main>
         </MyProviders>

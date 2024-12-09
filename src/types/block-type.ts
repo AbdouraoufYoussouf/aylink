@@ -13,7 +13,11 @@ const baseSchema = z.object({
 const urlSchema = baseSchema.extend({
   type: z.literal("URL"),
   url: z.string().url("L'URL doit être valide"),
+  imageFile: z.instanceof(File).optional(),
+  imageUrl: z.string().url("L'URL de l'image doit être valide").optional(),
+  altText: z.string().optional(),
 });
+
 
 const imageSchema = baseSchema.extend({
   type: z.literal("IMAGE"),
@@ -45,7 +49,7 @@ export const createSousBlocSchema = z.discriminatedUnion("type", [
   imageSchema,
   documentSchema,
   videoSchema,
-]);
+]);            
 
 
 export const createBlockShema = z.object({
@@ -53,6 +57,11 @@ export const createBlockShema = z.object({
   title: z.string().min(1, "Title is required"),
   subBlocks: z.array(createSousBlocSchema),
 })
+
+export type VideoSubBlocType = z.infer<typeof videoSchema>
+export type UrlSubBlocType = z.infer<typeof urlSchema>
+export type ImageSubBlocType = z.infer<typeof imageSchema>
+export type DocumentSubBlocType = z.infer<typeof documentSchema>
 
 export type BlockType = z.infer<typeof createBlockShema>
 export type CreateBlockType = z.infer<typeof createBlockShema>

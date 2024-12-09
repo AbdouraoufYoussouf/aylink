@@ -5,7 +5,7 @@ import { ExtendedUser } from "@/next-auth";
 import { messages } from "@/src/constants/messages";
 import { revalidatePath } from 'next/cache'
 import { deleteFileVercel, uploadFileVercel } from "./vercel.blob.action";
-import { UserProfilType, UserProfilTypeServer } from "@/src/types/user-type";
+import {  UserProfilTypeServer } from "@/src/types/user-type";
 
 export const getUserByEmail = async (email: string) => {
     try {
@@ -29,9 +29,9 @@ export const getUserProfilByPseudo = async (pseudo: string) => {
             },
             include: {
                 socialLinks: true,
-                categories: {
+                blocs: {
                     include: {
-                        blocks: true
+                        subBlocks: true
                     }
                 }
             }

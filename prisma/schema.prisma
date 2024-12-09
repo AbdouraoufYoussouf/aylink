@@ -8,18 +8,23 @@ datasource db {
   // uncomment next line if you use Prisma <5.10
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
-
 model Contact {
-  id       String  @id @default(cuid())
-  email    String  @unique
-  name     String
-  country  String?
-  ipAdress String?
-  location String?
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  name                String
+  country             String?
+  ipAddress           String?
+  location            String?
+  whatsapp            String?
+  message             String?
+  deviceType          String?
+  oneYearSubscription Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime? @updatedAt
 
-  users     User[]    @relation("UserContacts")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  formResponses FormResponse[]
+  users         User[]         @relation("UserContacts")
+  tags          Tag[]          @relation("ContactTags")
 }
 
 model User {
@@ -38,8 +43,69 @@ model User {
   accounts    Account[]
   socialLinks SocialLink[]
   blocs       Bloc[]
+  contacts    Contact[]   @relation("UserContacts")
+  tags        Tag[]       @relation("UserTags")
+  forms       Form[]
+}
 
-  contacts Contact[] @relation("UserContacts")
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  users    User[]    @relation("UserTags")
+  contacts Contact[] @relation("ContactTags")
+  forms    Form[]
+}
+
+model Form {
+  id        String    @id @default(cuid())
+  name      String
+  fields    Field[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  tag   Tag    @relation(fields: [tagId], references: [id])
+  tagId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model Field {
+  id        String    @id @default(cuid())
+  name      String
+  type      FieldType
+  required  Boolean   @default(false)
+  formId    String
+  form      Form      @relation(fields: [formId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  formResponses FormResponse[]
+}
+
+model FormResponse {
+  id        String   @id @default(cuid())
+  value     String
+  createdAt DateTime @default(now())
+
+  contact   Contact @relation(fields: [contactId], references: [id])
+  contactId String
+
+  field   Field  @relation(fields: [fieldId], references: [id])
+  fieldId String
+}
+
+enum FieldType {
+  TEXT
+  EMAIL
+  NUMBER
+  DATE
+  SELECT
+  RADIO
+  CHECKBOX
 }
 
 model SocialLink {
@@ -87,11 +153,11 @@ model SubBlock {
   updatedAt   DateTime    @updatedAt
 
   // Common fields for all types
-  url         String?
+  url String?
 
   // Fields for IMAGE type
-  imageUrl    String?
-  altText     String?
+  imageUrl String?
+  altText  String?
 
   // Fields for DOCUMENT type
   documentUrl String?

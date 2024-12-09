@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useState } from "react"
@@ -33,16 +34,16 @@ export function BlocksManager() {
     const subBlocksCount = Array.from(formData.keys()).filter(key => key.startsWith('subBlocks[')).length / 4
 
     for (let i = 0; i < subBlocksCount; i++) {
-      const subBlock: CreateSousBlockType = {
-        id: formData.get(`subBlocks[${i}][id]`) as string,
-        title: formData.get(`subBlocks[${i}][title]`) as string,
-        description: formData.get(`subBlocks[${i}][description]`) as string,
-        url: formData.get(`subBlocks[${i}][url]`) as string,
-        imageUrl: URL.createObjectURL(formData.get(`subBlocks[${i}][image]`) as File),
-        isPrivate: formData.get(`subBlocks[${i}][isPrivate]`) as unknown as boolean,
-        isDisplay: formData.get(`subBlocks[${i}][isDisplay]`) as unknown as boolean
-      }
-      newBloc.subBlocks.push(subBlock)
+      // const subBlock: CreateSousBlockType = {
+      //   id: formData.get(`subBlocks[${i}][id]`) as string,
+      //   title: formData.get(`subBlocks[${i}][title]`) as string,
+      //   description: formData.get(`subBlocks[${i}][description]`) as string,
+      //   url: formData.get(`subBlocks[${i}][url]`) as string,
+      //   imageUrl: URL.createObjectURL(formData.get(`subBlocks[${i}][image]`) as File),
+      //   isPrivate: formData.get(`subBlocks[${i}][isPrivate]`) as unknown as boolean,
+      //   isDisplay: formData.get(`subBlocks[${i}][isDisplay]`) as unknown as boolean
+      // }
+      // newBloc.subBlocks.push(subBlock)
     }
 
     setBlocs([...blocs, newBloc])
@@ -121,7 +122,7 @@ export function BlocksManager() {
                 <div key={sousBloc.id} className="flex relative gap-2 border rounded-lg p-2 items-center  mb-2">
                   <div className="">
                     <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
-                      <AvatarImage className="rounded" src={sousBloc.imageUrl} />
+                      {/* <AvatarImage className="rounded" src={sousBloc.imageUrl} /> */}
                       <AvatarFallback>SB</AvatarFallback>
                     </Avatar>
                   </div>

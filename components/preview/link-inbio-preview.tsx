@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import UserLinkPreviw from './link-inbio/user-link-previw'
+import UserLink from '../link-page/user-links/user-link'
 
 interface LinkInBioPreviewProps {
 
@@ -9,7 +9,7 @@ interface LinkInBioPreviewProps {
 export const LinkInBioPreview: React.FC<LinkInBioPreviewProps> = ({ }) => {
   return (
     <div>
-      <UserLinkPreviw pseudo='rafien' />
+      <UserLink isPreview pseudo='rafien' />
     </div>
   )
 }

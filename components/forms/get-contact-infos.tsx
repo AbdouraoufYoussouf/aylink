@@ -1,7 +1,6 @@
-/* eslint-disable react/no-unescaped-entities */
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -15,54 +14,34 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useServerActionMutation } from '@/lib/zsa.query'
 import { Loader2 } from 'lucide-react'
 import { contactInfoSchema } from "@/src/shemas/get-contact-info-shema"
 import { saveContactInfosAction } from "@/actions/contact-action"
-import { useParams } from "next/navigation"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-
-type Contact = {
-  name: string,
-  email: string,
-  pseudo: string
-}
+import { useParams, useRouter } from "next/navigation"
+import { CreateContactType } from "@/src/types/contact-type"
+import { FormModal } from "../modals/form-modal"
+import { toast } from "@/lib/use-toast"
 
 type GetContactInfosProps = {
   isModalOpen: boolean
   setIsModalOpen: (isOpen: boolean) => void
   currentLink: string
-  onUserInfoUpdate: (userInfo: Contact) => void
+  onUserInfoUpdate: (userInfo: CreateContactType) => void
 }
 
-
-export const GetUserInfos: React.FC<GetContactInfosProps> = ({ isModalOpen,onUserInfoUpdate, setIsModalOpen, currentLink }) => {
+export const GetUserInfos: React.FC<GetContactInfosProps> = ({ isModalOpen, onUserInfoUpdate, setIsModalOpen, currentLink }) => {
   const params = useParams()
-  const [userInfo, setUserInfo] = useState<z.infer<typeof contactInfoSchema> | null>(null)
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const storedInfo = localStorage.getItem('userInfo')
-    if (storedInfo) {
-      setUserInfo(JSON.parse(storedInfo))
-    }
-  }, [])
-
-  useEffect(() => {
-    if (userInfo) {
-      window.open(currentLink, '_blank')
-      setIsModalOpen(false)
-    }
-  }, [userInfo, currentLink, setIsModalOpen])
 
   const form = useForm<z.infer<typeof contactInfoSchema>>({
     resolver: zodResolver(contactInfoSchema),
     defaultValues: {
-      name: userInfo?.name || "",
-      email: userInfo?.email || "",
-      pseudo: params.pseudo as string ?? ""
+      name: "",
+      email: "",
+      pseudo: params.pseudo as string ?? "",
+      tag: "lioness",
     },
   })
 
@@ -72,22 +51,28 @@ export const GetUserInfos: React.FC<GetContactInfosProps> = ({ isModalOpen,onUse
         const newUserInfo = {
           name: form.getValues('name'),
           email: form.getValues('email'),
-          pseudo: params.pseudo as string
+          pseudo: params.pseudo as string,
+          tag: "lioness",
         }
+        
         onUserInfoUpdate(newUserInfo)
-        setUserInfo(newUserInfo)
-        window.open(currentLink, '_blank')
         form.reset()
         setIsModalOpen(false)
+        
+        // Use router.push for client-side navigation
+        router.push(currentLink)
       } else {
-        setError('Une erreur est survenue lors de l\'enregistrement de vos informations.')
+        toast({
+          title: 'Erreur',
+          description: 'Une erreur est survenue lors du traitement de vos informations.',
+          duration: 5000,
+        })
       }
     },
   })
 
   async function handleSubmit(values: z.infer<typeof contactInfoSchema>) {
     setIsLoading(true)
-    setError(null)
     try {
       let ipAddress, location, country;
 
@@ -123,71 +108,59 @@ export const GetUserInfos: React.FC<GetContactInfosProps> = ({ isModalOpen,onUse
       await mutateAsync(enrichedValues)
     } catch (error) {
       console.error('Erreur générale:', error)
-      setError('Une erreur est survenue lors du traitement de vos informations.')
+      toast({
+        title: 'Erreur',
+        description: 'Une erreur est survenue lors du traitement de vos informations.',
+        duration: 5000,
+      })
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleInteractOutside = (event: Event) => {
-    event.preventDefault();
-  };
-
-  if (userInfo) {
-    return null;
-  }
-
   return (
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-      <DialogContent onInteractOutside={handleInteractOutside} className=" max-w-[400px] rounded-lg">
-        <DialogHeader>
-          <DialogTitle className="text-left">Accès réservé à ma communauté</DialogTitle>
-          <DialogDescription className="text-left leading-4">
-            Veuillez entrer votre nom et votre email pour accéder au lien.
-          </DialogDescription>
-        </DialogHeader>
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Votre nom" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField 
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Adresse email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="Votre email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          
-            <Button type="submit" className="w-full" disabled={isLoading || isPending}>
-              {isLoading || isPending ? <Loader2 className="animate-spin mr-2" /> : null}
-              {isLoading || isPending ? "Chargement..." : "Accéder"}
-            </Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <FormModal
+      isModalOpen={isModalOpen}
+      setIsModalOpen={setIsModalOpen}
+      title="Accès réservé à ma communauté"
+      description="Veuillez entrer votre nom et votre email pour accéder au lien."
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom</FormLabel>
+                <FormControl>
+                  <Input placeholder="Votre nom" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormLabel>Adresse email</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="Votre email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" className="w-full" disabled={isLoading || isPending}>
+            {isLoading || isPending ? <Loader2 className="animate-spin mr-2" /> : null}
+            {isLoading || isPending ? "Chargement..." : "Accéder"}
+          </Button>
+        </form>
+      </Form>
+    </FormModal>
   )
 }
 
