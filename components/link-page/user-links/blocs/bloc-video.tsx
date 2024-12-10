@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -6,6 +7,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, ArrowRight } from 'l
 import { VideoSubBlocType } from '@/src/types/block-type';
 import { Button } from '@/components/ui/button';
 import { GetUserInfosIptv } from '@/components/forms/iptv-get-contact-infos';
+import { getOptimalBufferSize } from '@/lib/video-optimiser';
 import { LoadingSpinner } from '@/components/loading-spinner';
 
 type Props = {
@@ -23,36 +25,73 @@ export const BlocVideo = ({ subBloc }: Props) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const bufferCheckInterval = useRef<NodeJS.Timeout>();
 
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
 
-        // Preload metadata only initially
-        video.preload = "metadata";
-        
+        // Set initial buffer size
+        const bufferSize = getOptimalBufferSize();
+        if ('buffered' in video) {
+            video.preload = "auto";
+        }
+
         const handleLoadedMetadata = () => {
             setIsLoading(false);
+            // Start preloading a portion of the video
+            if (video.duration > 0) {
+                video.currentTime = 0.1; // Trigger initial buffering
+                setTimeout(() => {
+                    video.currentTime = 0;
+                }, 150);
+            }
         };
 
         const handleWaiting = () => {
-            setIsBuffering(true);
+            if (!isBuffering) {
+                setIsBuffering(true);
+            }
         };
 
-        const handlePlaying = () => {
+        const handleCanPlay = () => {
             setIsBuffering(false);
         };
 
+        const handleProgress = () => {
+            if (video.buffered.length > 0) {
+                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                const timeRemaining = video.duration - video.currentTime;
+                
+                // If buffer is running low, start buffering more
+                if (timeRemaining > 0 && bufferedEnd - video.currentTime < 10) {
+                    video.preload = "auto";
+                }
+            }
+        };
+
+        // Monitor buffering progress
+        bufferCheckInterval.current = setInterval(() => {
+            if (video.readyState < 4) { // HAVE_ENOUGH_DATA
+                handleProgress();
+            }
+        }, 1000);
+
         video.addEventListener('loadedmetadata', handleLoadedMetadata);
         video.addEventListener('waiting', handleWaiting);
-        video.addEventListener('playing', handlePlaying);
+        video.addEventListener('canplay', handleCanPlay);
+        video.addEventListener('progress', handleProgress);
 
         return () => {
             video.removeEventListener('loadedmetadata', handleLoadedMetadata);
             video.removeEventListener('waiting', handleWaiting);
-            video.removeEventListener('playing', handlePlaying);
+            video.removeEventListener('canplay', handleCanPlay);
+            video.removeEventListener('progress', handleProgress);
+            if (bufferCheckInterval.current) {
+                clearInterval(bufferCheckInterval.current);
+            }
         };
-    }, []);
+    }, [isBuffering]);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
@@ -68,7 +107,6 @@ export const BlocVideo = ({ subBloc }: Props) => {
                 if (isPlaying) {
                     await videoRef.current.pause();
                 } else {
-                    // Switch to full quality when playing
                     videoRef.current.preload = "auto";
                     await videoRef.current.play();
                 }
@@ -143,7 +181,11 @@ export const BlocVideo = ({ subBloc }: Props) => {
                         onTimeUpdate={handleProgress}
                         poster={subBloc.thumbnailUrl}
                         onClick={togglePlay}
-                        playsInline // Enables inline playback on iOS
+                        playsInline
+                        preload="metadata"
+                        controlsList="nodownload"
+                        crossOrigin="anonymous"
+                        style={{ objectFit: 'cover' }}
                     >
                         {subBloc.videoUrl && (
                             <source 
