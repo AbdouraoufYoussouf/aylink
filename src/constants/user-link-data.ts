@@ -64,6 +64,7 @@ export const blocs: BlockType[] = [
                 description: "Découvrez comment accéder à vos series,films et aux chaînes TV du monde entier en direct et profiter de vos contenus préférés.",
                 videoUrl: "/iptv.mp4",
                 thumbnailUrl: "/miniiptv.jpg",
+                
                 isPrivate: true,
                 isDisplay: true,
                 isPaid: false
