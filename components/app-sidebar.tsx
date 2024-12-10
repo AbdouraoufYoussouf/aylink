@@ -2,11 +2,10 @@
 
 import * as React from "react"
 import {
- 
+
   Command,
   LayoutDashboard,
   Link,
-  User,
   Users,
 } from "lucide-react"
 
@@ -24,6 +23,8 @@ import {
 } from "@/components/ui/sidebar"
 import { useSessionStatus } from "@/hooks/useSessionStatut"
 import { NavMain } from "./nav-main"
+import { useQuery } from "@tanstack/react-query"
+import { listTagsAction } from "@/actions/tag-action"
 
 // This is sample data.
 
@@ -32,16 +33,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const user = session?.user
 
+
+  const { isLoading, data: tags } = useQuery({
+    queryKey: ['tags', user?.pseudo],
+    queryFn: async () => {
+      const res = await listTagsAction();
+      if (res.success === true) {
+        return res.data;
+      }
+      return [];
+    },
+    enabled: !!session?.user.pseudo,
+    staleTime: 5000,
+  });
+
+
   const data = {
     user: user,
 
     navMain: [
       {
-        
-          title: "Ma page in bio",
-          url: "/dashboard/link",
-          icon: Link,
-        
+        title: "Ma page in bio",
+        url: "/dashboard/link",
+        icon: Link,
+
         items: [
           {
             title: "Profil info",
@@ -57,65 +72,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
         ],
       },
-     
-      // {
-      //   title: "Documentation",
-      //   url: "#",
-      //   icon: BookOpen,
-      //   items: [
-      //     {
-      //       title: "Introduction",
-      //       url: "#",
-      //     },
-      //     {
-      //       title: "Get Started",
-      //       url: "#",
-      //     },
-      //     {
-      //       title: "Tutorials",
-      //       url: "#",
-      //     },
-      //     {
-      //       title: "Changelog",
-      //       url: "#",
-      //     },
-      //   ],
-      // },
-      // {
-      //   title: "Settings",
-      //   url: "#",
-      //   icon: Settings2,
-      //   items: [
-      //     {
-      //       title: "General",
-      //       url: "#",
-      //     },
-      //     {
-      //       title: "Team",
-      //       url: "#",
-      //     },
-      //     {
-      //       title: "Billing",
-      //       url: "#",
-      //     },
-      //     {
-      //       title: "Limits",
-      //       url: "#",
-      //     },
-      //   ],
-      // },
+      {
+        title: "Mes leads",
+        url: "/dashboard/contact",
+        icon: Users,
+        items: [
+          {
+            title: "Tous les lead",
+            url: "/dashboard/contact",
+          },
+          ...(isLoading
+            ? [{ title: "Chargement des tags...", url: "#" }]
+            : Array.isArray(tags) && tags.length > 0
+              ? tags.map(tag => ({
+                title: `Lead ${tag.name.toUpperCase()}`,
+                url: `/dashboard/contact/tag/${tag.name}`,
+              }))
+              : [{ title: "Aucun tag trouvé", url: "#" }] // Fallback en cas d'absence de tags.
+          ),
+
+        ],
+      },
     ],
     menu: [
       {
         name: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
-      },
-    
-      {
-        name: "Mes contacts",
-        url: "/dashboard/contact",
-        icon: User,
       },
       {
         name: "Clients",
@@ -136,8 +119,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
+                  <span className="truncate font-semibold">AYlinker</span>
+                  <span className="truncate text-xs">Rafien</span>
                 </div>
               </a>
             </SidebarMenuButton>

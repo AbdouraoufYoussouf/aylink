@@ -9,6 +9,7 @@ export interface ContactType {
 export interface FilterContactParams {
     search?: string;
     pseudo?: string;
+    tag?: string;
     page: number;
     pageSize: number;
 }

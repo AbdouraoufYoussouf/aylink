@@ -1,7 +1,7 @@
 "use server"
 
 import { signIn } from "@/auth";
-import { currentAgent } from "@/lib/auth-utils";
+import { currentUser } from "@/lib/auth-utils";
 import { db } from "@/lib/db";
 import { action } from "@/lib/zsa";
 import { messages } from "@/src/constants/messages";
@@ -129,7 +129,7 @@ export const createUserAction = action
       }
 
       // Récupérer la session après connexion
-      const agent = await currentAgent();
+      const agent = await currentUser();
       // Assurez-vous que l'agent contient les propriétés requises
 
       // Connexion réussie

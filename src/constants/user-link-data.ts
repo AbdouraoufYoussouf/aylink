@@ -57,17 +57,17 @@ export const blocs: BlockType[] = [
         id: "1",
         title: "Films et Séries",
         subBlocks: [
-            // {
-            //     id: "1", // ID unique requis
-            //     type: "VIDEO",
-            //     title: "Films, Series et footbal en illimité",
-            //     description: "Découvrez comment accéder à vos series,films et aux chaînes TV du monde entier en direct et profiter de vos contenus préférés.",
-            //     videoUrl: "/miniiptv.mp4",
-            //     thumbnailUrl: "/miniiptv.jpg",
-            //     isPrivate: true,
-            //     isDisplay: true,
-            //     isPaid: false
-            // },
+            {
+                id: "1", // ID unique requis
+                type: "VIDEO",
+                title: "Films, Series et footbal en illimité",
+                description: "Découvrez comment accéder à vos series,films et aux chaînes TV du monde entier en direct et profiter de vos contenus préférés.",
+                videoUrl: "https://pzijefezqfozyw1n.public.blob.vercel-storage.com/profils/rafien/videos/iptv-YkFhf7vODYcdB4LdOCc075FGxW3IQ5.mp4",
+                thumbnailUrl: "/miniiptv.jpg",
+                isPrivate: true,
+                isDisplay: true,
+                isPaid: false
+            },
             {
                 id: "2",
                 type: "URL",

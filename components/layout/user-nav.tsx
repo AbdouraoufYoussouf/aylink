@@ -62,12 +62,15 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+            {
+              session?.user?.id && 
             <DropdownMenuItem className='cursor-pointer' asChild>
               <Link href={`/dashboard/agent/profil/${session.user.id}`} className="w-full flex items-center justify-between">
                 Profile
                 <User className="ml-2 h-4 w-4" />
               </Link>
             </DropdownMenuItem>
+            }
 
             <DropdownMenuItem  className='cursor-pointer' onClick={() => router.push('/dashboard/setting')}>
               Settings

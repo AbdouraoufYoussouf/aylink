@@ -36,10 +36,11 @@ import { getPageRange } from "@/lib/pagination"
 interface DataTableProps {
     columns: ColumnDef<ContactType, unknown>[]
     searchPlaceholder?: string
+    tag?: string
 }
 
 export function ContactDataTable({
-    columns,
+    columns, tag,
     searchPlaceholder,
 }: DataTableProps) {
     const [sorting, setSorting] = useState<SortingState>([])
@@ -56,11 +57,12 @@ export function ContactDataTable({
     const [total, setTotal] = useState(0)
 
     const { isLoading, data, refetch } = useQuery({
-        queryKey: ['contacts', currentPage, searchTerm],
+        queryKey: ['contacts', currentPage, searchTerm, tag],
         queryFn: async () => {
             const res = await getAllContactFilterAction({
                 search: searchTerm,
                 pseudo: session?.user.pseudo,
+                tag: tag,
                 pageSize: 50,
                 page: currentPage + 1,
             });
@@ -108,7 +110,16 @@ export function ContactDataTable({
         setIsResetSearch(false)
     }, [refetch])
 
+    // useEffect(() => {
+    //     // une fonction asyncrone pour executer une fonction coté server
+    //     const fetchData = async () => {
+    //         await assignTagToUserContacts()
+    //         }
+    //         fetchData()
+    // }, [])
+    
     useEffect(() => {
+
         if (searchTerm === "" || searchTerm.length >= 3) {
             refetch()
         }
@@ -185,7 +196,7 @@ export function ContactDataTable({
                 </div>
 
                 <div>
-                    <BtnDeleteContact disabled={contactsIds.length <= 0} setRowSelection={() => table.setRowSelection({})} contactIdsSelected={contactsIds} /> 
+                    <BtnDeleteContact disabled={contactsIds.length <= 0} setRowSelection={() => table.setRowSelection({})} contactIdsSelected={contactsIds} />
                 </div>
             </div>
 

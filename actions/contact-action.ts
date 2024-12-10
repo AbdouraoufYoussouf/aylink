@@ -28,15 +28,17 @@ export const saveContactIptvInfosAction = action
     const emailLowercase = email.toLowerCase();
 
     try {
-      let tagForUser: Tag | undefined;
+      let tagForUser: Tag | null = null;
       if (tag) {
-
-        // verifier si un tag avec son nom exist si non créer le tag
+        // Vérifier si le tag existe
         const existingTag = await db.tag.findUnique({
           where: { name: tag },
         });
 
-        if (!existingTag) {
+        if (existingTag) {
+          console.log("Tag existant trouvé :", existingTag);
+          tagForUser = existingTag; // Assigner le tag existant à tagForUser
+        } else {
           console.log("Ce tag n'existe pas, création du tag.");
           tagForUser = await db.tag.create({
             data: {
@@ -45,6 +47,7 @@ export const saveContactIptvInfosAction = action
           });
         }
       }
+
 
       // Validation des champs
       const validateFields = contactInfoSchema.safeParse(input);
@@ -57,7 +60,7 @@ export const saveContactIptvInfosAction = action
         where: { email: emailLowercase },
       });
 
-      if (existingContact && existingContact.whatsapp === whatsapp) {
+      if (existingContact) {
         console.log("Ce email et ce numéro nous ont déjà contacté, mise à jour des informations.");
 
         // Mise à jour des informations du contact existant
@@ -76,11 +79,12 @@ export const saveContactIptvInfosAction = action
             oneYearSubscription,
             updatedAt: new Date(),
           },
+          include: { tags: true }
         });
 
         return { success: true, data: updatedContact, message: "Contact mis à jour avec succès." };
       }
-
+    
       // Vérifier si un utilisateur avec ce pseudo existe
       const existingUser = await db.user.findUnique({
         where: { pseudo },
@@ -91,6 +95,7 @@ export const saveContactIptvInfosAction = action
         return { success: false, message: "Cet utilisateur n'existe pas." };
       }
 
+      console.log('tagforuser:', tagForUser)
 
       // Créer un nouveau contact si aucun contact existant n'a été trouvé
       const newContact = await db.contact.create({
@@ -112,6 +117,7 @@ export const saveContactIptvInfosAction = action
             connect: [{ id: existingUser.id }], // Lier le contact à l'utilisateur trouvé
           },
         },
+        include: { tags: true }
       });
 
       console.log("Contact créé avec succès");
@@ -137,15 +143,17 @@ export const saveContactInfosAction = action
         return { success: false, message: "Les informations saisies sont invalides." };
       }
 
-      let tagForUser: Tag | undefined;
+      let tagForUser: Tag | null = null;
       if (tag) {
-
-        // verifier si un tag avec son nom exist si non créer le tag
+        // Vérifier si le tag existe
         const existingTag = await db.tag.findUnique({
           where: { name: tag },
         });
 
-        if (!existingTag) {
+        if (existingTag) {
+          console.log("Tag existant trouvé :", existingTag);
+          tagForUser = existingTag; // Assigner le tag existant à tagForUser
+        } else {
           console.log("Ce tag n'existe pas, création du tag.");
           tagForUser = await db.tag.create({
             data: {
@@ -154,6 +162,7 @@ export const saveContactInfosAction = action
           });
         }
       }
+
 
       // Vérifier si un contact avec le même email existe déjà
       const existingContact = await db.contact.findUnique({
@@ -189,6 +198,7 @@ export const saveContactInfosAction = action
             connect: [{ id: existingUser.id }], // Lier le contact au user trouvé
           },
         },
+        include: { tags: true }
       });
 
       console.log("Contact créé avec succès");
@@ -205,9 +215,9 @@ export const saveContactInfosAction = action
 export const getAllContactFilterAction = async (filters: FilterContactParams): Promise<ContactResponse> => {
   try {
     // Validate and sanitize pagination parameters
-    const sanitizedPage = Math.max(1, filters.page || 1); // Ensure page is at least 1
-    const sanitizedPageSize = Math.min(100, Math.max(1, filters.pageSize || 10)); // Ensure pageSize is between 1 and 100
-    const { search, pseudo } = filters;
+    const { search, pseudo, tag, page, pageSize } = filters;
+    const sanitizedPage = Math.max(1, page || 1); // Ensure page is at least 1
+    const sanitizedPageSize = Math.min(100, Math.max(1, pageSize || 10)); // Ensure pageSize is between 1 and 100
 
     // Find user by pseudo
     const user = await db.user.findUnique({
@@ -226,7 +236,7 @@ export const getAllContactFilterAction = async (filters: FilterContactParams): P
       };
     }
 
-    // Build where clause for filtering
+
     const where: Prisma.ContactWhereInput = {
       users: {
         some: {
@@ -234,6 +244,15 @@ export const getAllContactFilterAction = async (filters: FilterContactParams): P
         },
       },
     };
+
+    // Ajouter conditionnellement le filtre "tags" si "tag" est défini
+    if (tag) {
+      where.tags = {
+        some: {
+          name: tag,
+        },
+      };
+    }
 
     // Add search filter if provided
     if (search?.trim()) {
@@ -316,3 +335,53 @@ export const deleteManyContactAction = action
       return { success: false, message: "Erreur lors de la suppression des contacts." };
     }
   });
+
+
+  export const assignTagToUserContacts = async () => {
+    const tagName = "lioness";
+  
+    try {
+      // Récupérer l'utilisateur avec le pseudo 'rafien'
+      const user = await db.user.findUnique({
+        where: { pseudo: "rafien" },
+        include: { contacts: true }, // Inclure les contacts associés à cet utilisateur
+      });
+  
+      if (!user) {
+        console.log("Utilisateur avec le pseudo 'rafien' introuvable.");
+        return { success: false, message: "Aucun utilisateur 'rafien' trouvé." };
+      }
+  
+      console.log(`Utilisateur trouvé : ${user.id} avec ${user.contacts.length} contacts.`);
+  
+      // Vérifier ou créer le tag 'Lioness'
+      let tagForLioness = await db.tag.findUnique({ where: { name: tagName } });
+  
+      if (!tagForLioness) {
+        console.log(`Création du tag '${tagName}'...`);
+        tagForLioness = await db.tag.create({ data: { name: tagName } });
+      }
+  
+      console.log(`Tag trouvé/créé :`, tagForLioness);
+  
+      // Lier chaque contact de l'utilisateur au tag
+      for (const contact of user.contacts) {
+        console.log(`Association du tag '${tagName}' au contact : ${contact.email}`);
+  
+        await db.contact.update({
+          where: { id: contact.id },
+          data: {
+            tags: { connect: [{ id: tagForLioness.id }] },
+            updatedAt: new Date(),
+          },
+        });
+      }
+  
+      console.log("Association des contacts au tag terminée.");
+      return { success: true, message: "Tous les contacts ont été associés au tag avec succès." };
+    } catch (error) {
+      console.error("Erreur lors de l'association des contacts au tag :", error);
+      return { success: false, message: "Une erreur est survenue lors du traitement." };
+    }
+  };
+  

@@ -1,4 +1,3 @@
-'use server'
 
 import { redirect } from 'next/navigation'
 
@@ -34,4 +33,9 @@ export async function sendWhatsAppMessage(formData: FormData) {
         console.error('Error sending WhatsApp message:', error)
         // Gérez l'erreur (par exemple, redirigez vers une page d'erreur ou affichez un message à l'utilisateur)
     }
+}
+
+
+export function getWhatsAppLink(whatsappNumber: string, message: string): string {
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message.trim())}`;
 }

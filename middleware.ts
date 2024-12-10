@@ -15,6 +15,7 @@ export default auth((req: { auth?: any; nextUrl?: any; }) => {
     return NextResponse.redirect(new URL('/dashboard', nextUrl));
   }
 
+
   // Si l'utilisateur n'est pas connecté et essaie d'accéder à /dashboard, rediriger vers la page de connexion
   if (!isLoggedIn && nextUrl.pathname.startsWith('/dashboard')) {
     return NextResponse.redirect(new URL('/auth/login', nextUrl));

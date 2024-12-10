@@ -21,7 +21,7 @@ import { useServerActionMutation } from '@/lib/zsa.query'
 import { Loader2 } from 'lucide-react'
 import { contactInfoSchema } from "@/src/shemas/get-contact-info-shema"
 import { saveContactIptvInfosAction } from "@/actions/contact-action"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { toast } from "@/lib/use-toast"
 import { FormModal } from "../modals/form-modal"
 import {
@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { getWhatsAppLink } from "@/lib/whatsapp-utils"
 
 type Props = {
   isModalOpen: boolean
@@ -41,6 +42,7 @@ export const GetUserInfosIptv: React.FC<Props> = ({ isModalOpen, setIsModalOpen 
   const params = useParams()
   const [userInfo, setUserInfo] = useState<z.infer<typeof contactInfoSchema> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const storedInfo = localStorage.getItem('userInfo')
@@ -65,16 +67,46 @@ export const GetUserInfosIptv: React.FC<Props> = ({ isModalOpen, setIsModalOpen 
 
   const { isPending, mutateAsync } = useServerActionMutation(saveContactIptvInfosAction, {
     onSuccess(res) {
-      if (res?.success === true) {
+      if (res?.success === true && res.data) {
         form.reset()
         setIsModalOpen(false)
         console.log(res)
         toast({
           title: 'Succès',
-          description: 'Message reçu, nous vous contacterons bientôt.',
+          description: 'Allons maintenant discuter sur whatsApp.',
           duration: 5000,
         })
+        // Rediriger vers WhatsApp
+        // Rediriger vers WhatsApp
+        const nameField = res.data.name ? `*Nom* : ${res.data.name}` : '';
+        const emailField = res.data.email ? `*Email* : ${res.data.email}` : '';
+        const whatsappField = res.data.whatsapp ? `*WhatsApp* : ${res.data.whatsapp}` : '';
+        const deviceTypeField = res.data.deviceType ? `*Type d'appareil* : ${res.data.deviceType}` : '';
+        const additionalMessage = res.data.message ? `*Infos sup* : ${res.data.message}` : '';
+        const subscriptionInfo = res.data.oneYearSubscription
+          ? "Je souhaite connaître le tarif pour un abonnement d'un an et comment payer. Merci!"
+          : "Merci pour votre aide!";
+
+        // Assemble the message with explicit line breaks
+        const message = `Bonjour Rafien,\n\n` +
+          `Je suis intéressé par l'abonnement IPTV. Voici mes coordonnées pour obtenir les codes :\n\n` +
+          `${nameField ? `- ${nameField}\n` : ''}` +
+          `${emailField ? `- ${emailField}\n` : ''}` +
+          `${whatsappField ? `- ${whatsappField}\n` : ''}` +
+          `${deviceTypeField ? `- ${deviceTypeField}\n` : ''}` +
+          `${additionalMessage ? `- ${additionalMessage}\n` : ''}\n` +
+          `${subscriptionInfo}`;
+
+        // Open WhatsApp with the formatted message
+        const whatsappNumber = process.env.NEXT_PUBLIC_MY_WHATSAPP_NUMBER || '33751536056';
+        const whatsappLink = getWhatsAppLink(whatsappNumber, message);
+        // patienter 3 secondes avant de rediriger
+        setTimeout(() => {
+          router.push(whatsappLink);
+        }, 3000);
+
       } else {
+        console.log('reserr:', res)
         toast({
           title: 'Erreur',
           description: 'Une erreur est survenue lors du traitement de vos informations.',
@@ -177,8 +209,6 @@ export const GetUserInfosIptv: React.FC<Props> = ({ isModalOpen, setIsModalOpen 
                   <Input className="text-sm" type="tel"
                     inputMode="numeric" placeholder="Incluez l'indicatif pays, exp. 33..." {...field} />
                 </FormControl>
-                <span className="leading-4 text-muted-foreground text-sm">
-                  Vous recevrez un message via whatsapp.</span>
                 <FormMessage />
               </FormItem>
             )}
@@ -246,7 +276,7 @@ export const GetUserInfosIptv: React.FC<Props> = ({ isModalOpen, setIsModalOpen 
             )}
           />
           <div className="grid grid-cols-2 gap-4 items-center">
-            <Button onClick={()=>setIsModalOpen(false)} variant={'outline'} >Annuler</Button>
+            <Button onClick={() => setIsModalOpen(false)} variant={'outline'} >Annuler</Button>
             <Button type="submit" className="w-full" disabled={isLoading || isPending}>
               {isLoading || isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               {isLoading || isPending ? "Envoi en cours..." : "Envoyer"}
