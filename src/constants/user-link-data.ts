@@ -82,6 +82,17 @@ export const blocs: BlockType[] = [
             {
                 id: "4",
                 type: "URL",
+                title: "Mon WhatsApp",
+                description: "Pour tout infos sur l'abonnement IPTV.",
+                url: "https://wa.me/33751536056",
+                imageUrl: "/whatsapp.webp",
+                isPrivate: false,
+                isDisplay: true,
+                isPaid: false
+            },
+            {
+                id: "5",
+                type: "URL",
                 title: "Mon telegram",
                 description: "Rejoignez mon canal Telegram pour des astuces séries/films et des offres IPTV exclusives.",
                 url: "https://t.me/rafien_fr",
@@ -89,7 +100,7 @@ export const blocs: BlockType[] = [
                 isPrivate: false,
                 isDisplay: true,
                 isPaid: false
-            }
+            },
         ]
     },
     {
