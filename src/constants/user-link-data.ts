@@ -62,9 +62,10 @@ export const blocs: BlockType[] = [
                 type: "VIDEO",
                 title: "Films, Series et footbal en illimité",
                 description: "Découvrez comment accéder à vos series,films et aux chaînes TV du monde entier en direct et profiter de vos contenus préférés.",
-                videoUrl: "/iptv.mp4",
+                videoUrl: "https://raflink.s3.eu-west-3.amazonaws.com/videos/cm46sjhud000110f5m8idrgd45/cm46sjhud000110f5m8idrg36/9bfdacf-iptv.mp4",
                 thumbnailUrl: "/miniiptv.jpg",
-                
+                actionType:"FORM",
+                actionFormId:"1",
                 isPrivate: true,
                 isDisplay: true,
                 isPaid: false

@@ -2,6 +2,7 @@ import * as z from "zod"
 
 const baseSchema = z.object({
   id: z.string(),
+  blocId: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "La description est requise"),
   isPrivate: z.boolean().default(false),
@@ -34,13 +35,17 @@ const documentSchema = baseSchema.extend({
   fileSize: z.number().optional(),
 });
 
-const videoSchema = baseSchema.extend({
+export const videoSchema = baseSchema.extend({
   type: z.literal("VIDEO"),
-  videoUrl: z.string().url("L'URL de la vidéo doit être valide").optional(),
+  videoUrl: z.string().optional(),
   videoFile: z.instanceof(File).optional(),
-  thumbnailUrl: z.string().url("L'URL de la miniature doit être valide").optional(),
+  thumbnailFile: z.instanceof(File).optional(),
+  thumbnailUrl: z.string().optional(),
   duration: z.number().optional(),
   embedCode: z.string().optional(),
+  actionType: z.enum(["URL", "FORM"]),
+  actionUrl: z.string().optional(),
+  actionFormId: z.string().optional(),
 })
 
 

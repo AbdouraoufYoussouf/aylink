@@ -91,38 +91,6 @@ const initialBlocs: BlockType[] = [
       },
     ],
   },
-  {
-    id: "4",
-    title: "Bloc VIDEO",
-    subBlocks: [
-      {
-        id: "4-1",
-        title: "Vidéo tutoriel React",
-        description: "Un tutoriel pour apprendre React pas à pas.",
-        type: "VIDEO",
-        videoUrl: "https://www.youtube.com/watch?v=w7ejDZ8SWv8",
-        thumbnailUrl: "https://img.youtube.com/vi/w7ejDZ8SWv8/0.jpg",
-        duration: 600, // 10 minutes
-        isPrivate: false,
-        isPaid:false,
-        price:50,
-        isDisplay: true,
-      },
-      {
-        id: "4-2",
-        title: "Introduction à TypeScript",
-        description: "Vidéo de présentation des bases de TypeScript.",
-        type: "VIDEO",
-        videoUrl: "https://www.youtube.com/watch?v=BwuLxPH8IDs",
-        thumbnailUrl: "https://img.youtube.com/vi/BwuLxPH8IDs/0.jpg",
-        duration: 720, // 12 minutes
-        isPrivate: true,
-        isPaid:false,
-        price:50,
-        isDisplay: false,
-      },
-    ],
-  },
 ];
 
 export default initialBlocs;

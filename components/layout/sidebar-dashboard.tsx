@@ -15,7 +15,6 @@ import { usePathname } from 'next/navigation'
 const DashboardContent = ({ children }: { children: React.ReactNode }) => {
     const { open } = useSidebar()
     const path = usePathname()
-    console.log(path)
 
     return (
         <div className='w-full'>

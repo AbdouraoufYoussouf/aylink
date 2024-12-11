@@ -1,42 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardContent } from "@/components/ui/card"
 
 import Image from 'next/image'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
-import GetUserInfos from '@/components/forms/get-contact-infos'
 import { useQuery } from '@tanstack/react-query'
 import { getUserProfilByPseudo } from '@/actions/user-action'
-import { TwitterIcon as TikTok, Youtube, PhoneIcon as Whatsapp, ExternalLink, Lock } from 'lucide-react'
-import { FaGithub, FaTiktok, FaWhatsapp, FaYoutube } from 'react-icons/fa'
-import { ContactType } from '@/src/types/contact-type'
+
 import UserLinkSkeleton from './link-page-skeleton'
 import { BlocVideo } from './blocs/bloc-video'
 import { blocs, profilData } from '@/src/constants/user-link-data'
 import { BlocUrl } from './blocs/bloc-url'
 
-interface SubBlock {
-  title: string;
-  description: string;
-  link: string;
-  image: string;
-  isPrivate: boolean;
-}
-
-interface Category {
-  name: string;
-  blocks: SubBlock[];
-}
-
 type Props = {
   pseudo: string,
   isPreview?: boolean
 }
-
-
 
 export default function UserLink({ pseudo, isPreview }: Props) {
 

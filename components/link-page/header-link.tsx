@@ -10,7 +10,7 @@ export function HeaderLink() {
 
     const links = [
         { href: "/dashboard/link", label: "Profile" },
-        { href: "/dashboard/link/block", label: "Blocs" }
+        { href: "/dashboard/link/bloc", label: "Blocs" }
     ]
 
     return (

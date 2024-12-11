@@ -65,6 +65,7 @@ export default function ProfileManager() {
       if (session?.user) {
         const response = await getProfilUser(session?.user.id)
         if (response.success && response.data) {
+          console.log(response.data)
           const reseauxSocialLinks = mapSocialLinks(response.data.socialLinks, iconReseaux);
           const profileData: UserProfilType = {
             id: response.data.id,
@@ -133,6 +134,7 @@ export default function ProfileManager() {
 
     try {
       const response = await updateProfileAction(formData)
+      console.log(response.data)
 
       if (response?.success && response.data) {
         const reseauxSocialLinks = mapSocialLinks(response.data.socialLinks, iconReseaux);

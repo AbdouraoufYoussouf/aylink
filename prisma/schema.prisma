@@ -8,6 +8,7 @@ datasource db {
   // uncomment next line if you use Prisma <5.10
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
+
 model Contact {
   id                  String    @id @default(cuid())
   email               String    @unique
@@ -43,8 +44,8 @@ model User {
   accounts    Account[]
   socialLinks SocialLink[]
   blocs       Bloc[]
-  contacts    Contact[]   @relation("UserContacts")
-  tags        Tag[]       @relation("UserTags")
+  contacts    Contact[]    @relation("UserContacts")
+  tags        Tag[]        @relation("UserTags")
   forms       Form[]
 }
 
@@ -60,11 +61,11 @@ model Tag {
 }
 
 model Form {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   fields    Field[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   tag   Tag    @relation(fields: [tagId], references: [id])
   tagId String
@@ -169,6 +170,14 @@ model SubBlock {
   thumbnailUrl String?
   duration     Int?
   embedCode    String?
+  actionType   VideoActionType?
+  actionFormId String?
+  actionUrl    String?
+}
+
+enum VideoActionType {
+  URL
+  FORM
 }
 
 model Account {

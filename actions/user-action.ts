@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use server"
 
 import { db } from "@/lib/db";
 import { ExtendedUser } from "@/next-auth";
 import { messages } from "@/src/constants/messages";
 import { revalidatePath } from 'next/cache'
-import { deleteFileVercel, uploadFileVercel } from "./vercel.blob.action";
 import {  UserProfilTypeServer } from "@/src/types/user-type";
+import { deleteFileAws, uploadFileAws } from "./aws-action";
 
 export const getUserByEmail = async (email: string) => {
     try {
@@ -116,29 +117,34 @@ export const updateProfileAction = async (formData: FormData) => {
         // Extract profile data
         const username = formData.get('username') as string
         const bio = formData.get('bio') as string
-        const profileImage = formData.get('imageUrl') as string
+        // const profileImage = formData.get('imageUrl') as string
+        // const bannerImage = formData.get('imageUrl') as string
         const imageFile = formData.get('image') as File | null
         const bannerFile = formData.get('banner') as File | null
 
         // Handle image upload (assuming you have a function for this)
         let imageUrl = null
-        const path = `profils/${username}/${imageFile?.name}`
+        const path = `profils/${username}/`
         if (imageFile) {
-            if (profileImage) {
-                await deleteFileVercel(profileImage);
+            // if (profileImage) {
+            //     await deleteFileAws(profileImage);
+            // }
+            const blob = await uploadFileAws(imageFile, path)
+            if(blob){
+                imageUrl = blob
             }
-            const blob = await uploadFileVercel(imageFile, path)
-            imageUrl = blob.url
         }
         // Handle banner upload (assuming you have a function for this)
         let bannerUrl = null
         const pathBanner = `profils/${username}/${bannerFile?.name}`
         if (bannerFile) {
-            if (profileImage) {
-                await deleteFileVercel(profileImage);
+            // if (bannerImage) {
+            //     await deleteFileAws(bannerImage);
+            // }
+            const blob = await uploadFileAws(bannerFile, pathBanner)
+            if(blob){
+                bannerUrl = blob
             }
-            const blob = await uploadFileVercel(bannerFile, pathBanner)
-            bannerUrl = blob.url
         }
 
         // Extract social links data
