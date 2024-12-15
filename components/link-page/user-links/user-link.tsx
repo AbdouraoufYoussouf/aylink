@@ -33,9 +33,8 @@ export default function UserLink({ pseudo, isPreview }: Props) {
   });
 
 
-
   if (isLoading) {
-    return <UserLinkSkeleton />
+    return <UserLinkSkeleton isPreview={isPreview} />
   }
 
   return (
@@ -109,9 +108,9 @@ export default function UserLink({ pseudo, isPreview }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: blocIndex * 0.1 }}
                 >
-                  <h2 className="text-lg font-semibold underline mb-2">{bloc.title}</h2>
+                  <h2 className="text-lg font-semibold underline mb-2">{bloc.name}</h2>
                   <div className="space-y-3">
-                    {bloc.subBlocks.map((subBloc, subBlocIndex) => {
+                    {bloc.subBlocs && bloc.subBlocs.map((subBloc, subBlocIndex) => {
 
                       return (
                         <>

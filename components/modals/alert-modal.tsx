@@ -38,12 +38,12 @@ export const AlertModal: React.FC<AlertModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
     >
-      <div className="flex w-full items-center justify-end space-x-2 pt-6">
+      <div className="flex w-auto items-center justify-end space-x-2 pt-4">
         <Button disabled={loading} variant="outline" onClick={onClose}>
           Cancel
         </Button>
         <Button disabled={loading} variant="destructive" onClick={onConfirm}>
-           {!loading ? "Continue": <Loader2 className='animate-spin' /> } 
+          {!loading ? "Continue" : <Loader2 className='animate-spin' />}
         </Button>
       </div>
     </Modal>

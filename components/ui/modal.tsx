@@ -30,7 +30,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <Dialog modal open={isOpen} onOpenChange={onChange}>
-      <DialogContent>
+      <DialogContent className='w-auto min-w-[20rem]'>
         <DialogHeader>
           <DialogTitle className='text-left'>{title}</DialogTitle>
           <DialogDescription className='text-left'>{description}</DialogDescription>

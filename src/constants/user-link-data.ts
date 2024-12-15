@@ -1,11 +1,11 @@
-import { BlockType } from "../types/block-type"
+import { BlocType } from "../types/bloc-type"
 import { FaGithub, FaTiktok, FaWhatsapp, FaYoutube } from 'react-icons/fa'
 import { UserProfilType } from "../types/user-type"
 
 export const profilData: UserProfilType = {
     id: "1",
     pseudo: "Rafien",
-    description: "💻 Développeur et créateur de contenu, dans ce profil je vous aide à accéder aux meilleurs films 🎬, séries 📺 et événements sportifs ⚽ via une solution IPTV fiable. Consultez les liens ci-dessous.",
+    description: "💻 Développeur et créateur de contenu, dans ce profil je vous aide à accéder aux meilleurs films 🎬, séries 📺 et événements sportifs ⚽. Consultez les liens ci-dessous.",
     image: "/rafien.png",
     banner: "/baniptv.png",
     socialLinks: [
@@ -25,14 +25,7 @@ export const profilData: UserProfilType = {
             name: "",
             isActive: false
         },
-        {
-            icon: FaTiktok,
-            url: "https://www.tiktok.com/@story.scool",
-            color: "",
-            id: "",
-            name: "",
-            isActive: false
-        },
+     
         {
             name: 'GitHub',
             icon: FaGithub,
@@ -52,20 +45,32 @@ export const profilData: UserProfilType = {
     ]
 }
 
-export const blocs: BlockType[] = [
+export const blocs: BlocType[] = [
     {
         id: "1",
-        title: "Films et Séries",
-        subBlocks: [
+        name: "Films et Séries",
+        subBlocs: [
+            // {
+            //     id: "1", // ID unique requis
+            //     type: "VIDEO",
+            //     title: "Films, Series et footbal en illimité",
+            //     description: "Découvrez comment accéder à vos series,films et aux chaînes TV du monde entier en direct et profiter de vos contenus préférés.",
+            //     videoUrl: "/pub2.mp4",
+            //     thumbnailUrl: "/miniiptv.jpg",
+            //     actionType:"FORM",
+            //     actionFormId:"1",
+            //     isPrivate: true,
+            //     isDisplay: true,
+            //     isPaid: false
+            // },
             {
-                id: "1", // ID unique requis
-                type: "VIDEO",
-                title: "Films, Series et footbal en illimité",
-                description: "Découvrez comment accéder à vos series,films et aux chaînes TV du monde entier en direct et profiter de vos contenus préférés.",
-                videoUrl: "https://raflink.s3.eu-west-3.amazonaws.com/videos/cm46sjhud000110f5m8idrgd45/cm46sjhud000110f5m8idrg36/9bfdacf-iptv.mp4",
-                thumbnailUrl: "/miniiptv.jpg",
-                actionType:"FORM",
-                actionFormId:"1",
+                id: "2",
+                type: "URL",
+                title: "Red One",
+                description: "Best film avec The Rock et Captaine americain",
+            
+                url: "https://vvw.french-stream.bio/15119029-red-one.html",
+                imageUrl: "/redone.jpg",
                 isPrivate: true,
                 isDisplay: true,
                 isPaid: false
@@ -85,7 +90,7 @@ export const blocs: BlockType[] = [
                 id: "4",
                 type: "URL",
                 title: "Mon WhatsApp",
-                description: "Pour tout infos sur l'abonnement IPTV.",
+                description: "Ecrivez moi ici si vous voulez l'abonnement IPTV.",
                 url: "https://wa.me/33751536056",
                 imageUrl: "/whatsapp.webp",
                 isPrivate: false,
@@ -107,8 +112,8 @@ export const blocs: BlockType[] = [
     },
     {
         id: "2",
-        title: "Mes Services",
-        subBlocks: [
+        name: "Mes Services",
+        subBlocs: [
             {
                 id: "5",
                 type: "URL",

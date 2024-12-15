@@ -32,7 +32,7 @@ export const getUserProfilByPseudo = async (pseudo: string) => {
                 socialLinks: true,
                 blocs: {
                     include: {
-                        subBlocks: true
+                        subBlocs: true
                     }
                 }
             }

@@ -5,30 +5,31 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { X } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AddUrlBlock } from "../user-links/blocs/add-url-bloc-form"
 import { AddImageBlock } from "../user-links/blocs/add-image-bloc-form"
 import { AddVideoBlock } from "../user-links/blocs/add-video-bloc-form"
+import { SubBlocTypeType } from "@/src/types/bloc-type"
 
 
 interface AddSousBlocProps {
-  blocId: string
-  isAddSousBloc: boolean
+  subBlocType:SubBlocTypeType
+  blocId?: string
+  titleBloc?: string
+  isAddSousBloc?: boolean
   setIsAddSousBloc: (isAddSousBloc: boolean) => void
-  onAddSousBloc: (blocId: string, sousBloc: any) => void
 }
 
-export function AddSousBlock({ blocId, setIsAddSousBloc, onAddSousBloc }: AddSousBlocProps) {
-  const [selectedType, setSelectedType] = useState<string>("VIDEO")
+export function AddSousBlock({subBlocType,  blocId, setIsAddSousBloc }: AddSousBlocProps) {
+  const [selectedType, setSelectedType] = useState<string>(subBlocType)
 
   const renderSubBlockComponent = () => {
     switch (selectedType) {
       case "URL":
-        return <AddUrlBlock type={selectedType} blocId={blocId} onAddSousBloc={onAddSousBloc} />
+        return <AddUrlBlock setIsAddSousBloc={setIsAddSousBloc} blocId={blocId!} />
       case "IMAGE":
-        return <AddImageBlock type={selectedType} blocId={blocId} onAddSousBloc={onAddSousBloc} />
-    case "VIDEO":
-        return <AddVideoBlock type={selectedType} blocId={blocId} onAddSousBloc={onAddSousBloc} />
+        return <AddImageBlock setIsAddSousBloc={setIsAddSousBloc} blocId={blocId!} />
+      case "VIDEO":
+        return <AddVideoBlock setIsAddSousBloc={setIsAddSousBloc} blocId={blocId!} />
       default:
         return null
     }
@@ -48,22 +49,6 @@ export function AddSousBlock({ blocId, setIsAddSousBloc, onAddSousBloc }: AddSou
       </CardHeader>
       <CardContent className="px-4 py-2">
         <div className="space-y-4">
-          <div>
-            <label htmlFor="type-select" className="block text-sm font-medium text-gray-700 mb-1">
-              Type de sous-bloc
-            </label>
-            <Select onValueChange={setSelectedType} defaultValue={selectedType}>
-              <SelectTrigger id="type-select">
-                <SelectValue placeholder="Sélectionnez le type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="URL">URL</SelectItem>
-                <SelectItem value="IMAGE">Image</SelectItem>
-                <SelectItem value="DOCUMENT">Document</SelectItem>
-                <SelectItem value="VIDEO">Vidéo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           {renderSubBlockComponent()}
         </div>
       </CardContent>

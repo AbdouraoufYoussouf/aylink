@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, Camera, Lock, Unlock } from 'lucide-react'
-import { CreateSousBlockType, createSousBlocSchema } from "@/src/types/block-type"
+import { SousBlocType, createSousBlocSchema } from "@/src/types/bloc-type"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AutoResizeTextarea } from "@/components/auto-rezise-textarea"
 import ImageCropper from "@/components/image-cropper"
@@ -36,14 +36,14 @@ interface AddSousBlocProps {
   blocId: string
   isAddSousBloc: boolean
   setIsAddSousBloc: (isAddSousBloc: boolean) => void
-  onAddSousBloc: (blocId: string, sousBloc: CreateSousBlockType) => void
+  onAddSousBloc: (blocId: string, sousBloc: SousBlocType) => void
 }
 
 export function AddSousBlock({ setIsAddSousBloc }: AddSousBlocProps) {
   const [isCropping, setIsCropping] = useState(false)
   const [tempImageUrl, setTempImageUrl] = useState<string | null>(null)
 
-  const form = useForm<CreateSousBlockType>({
+  const form = useForm<SousBlocType>({
     resolver: zodResolver(createSousBlocSchema),
     defaultValues: {
       id: uuidv4(),
@@ -56,7 +56,7 @@ export function AddSousBlock({ setIsAddSousBloc }: AddSousBlocProps) {
     },
   })
 
-  const onSubmit = (data: CreateSousBlockType) => {
+  const onSubmit = (data: SousBlocType) => {
     // onAddSousBloc(blocId, data)
     console.log("sous bloc", data)
     // form.reset()
@@ -121,29 +121,29 @@ export function AddSousBlock({ setIsAddSousBloc }: AddSousBlocProps) {
                   </FormItem>
                 )}
               />
-                 <FormField
-        control={form.control}
-        name="type"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Type d'URL</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez le type d'URL" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="default">Par défaut</SelectItem>
-                <SelectItem value="video">Vidéo</SelectItem>
-                <SelectItem value="document">Document</SelectItem>
-                <SelectItem value="image">Image</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type d'URL</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez le type d'URL" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="default">Par défaut</SelectItem>
+                        <SelectItem value="video">Vidéo</SelectItem>
+                        <SelectItem value="document">Document</SelectItem>
+                        <SelectItem value="image">Image</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="space-y-3">
               <FormField

@@ -16,7 +16,7 @@ export const IPhoneFrame: React.FC<IPhoneFrameProps> = ({ children }) => {
       {/* Power button */}
       <div className="absolute rounded-full top-[120px] right-[0px] w-[4px] h-[65px] bg-gray-400 rounded-r-full"></div>
 
-      <div className="relative w-[370px] max-h-[790px] min-h-[750px] border-4 border-gray-500 rounded-[50px] shadow-xl overflow-hidden">
+      <div className="relative w-[370px] z-30 max-h-[790px] min-h-[750px] border-4 border-gray-500 rounded-[50px] shadow-xl overflow-hidden">
         {/* Network signal icon */}
         <div className="absolute top-[0px] z-20 left-1/2 transform -translate-x-1/2 w-[100%] h-[27px] bg-background">
           <div className="ml-[25px] -mt-1 flex items-end w-full h-[27px] gap-[2px]">

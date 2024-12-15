@@ -1,4 +1,4 @@
-import { BlocksManager } from "@/components/link-page/blocks/block-manager";
+import { BlocksManager } from "@/components/link-page/blocks/bloc-manager";
 
 export default function BlocksPage() {
   return <BlocksManager />

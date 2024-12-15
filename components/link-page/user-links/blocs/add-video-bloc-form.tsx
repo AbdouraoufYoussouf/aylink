@@ -11,23 +11,25 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { videoSchema } from '@/src/types/block-type'
+import { videoSchema } from '@/src/types/bloc-type'
 import { z } from 'zod'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { toast } from '@/lib/use-toast'
-import { AddSubBlocVideoAction } from '@/actions/bloc-video-action'
+import { AddSubBlocVideoAction } from '@/actions/blocs/bloc-video-action'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Loader2 } from 'lucide-react'
+import { useBlocStore } from '@/store/bloc-store'
 
 interface AddVideoBlockProps {
-    type: string
     blocId: string
-    onAddSousBloc: (blocId: string, sousBloc: any) => void
+    setIsAddSousBloc: (isAddSousBloc: boolean) => void
+
 }
-export const AddVideoBlock = ({  }: AddVideoBlockProps) => {
+export const AddVideoBlock = ({ setIsAddSousBloc, blocId }: AddVideoBlockProps) => {
     const [isVideoUpload, setIsVideoUpload] = useState(false)
     const [isthumnailUpload, setIsthumnailUpload] = useState(false)
     const [isPending, setIsPending] = useState(false)
+    const { addSubBloc } = useBlocStore()
 
     const form = useForm<z.infer<typeof videoSchema>>({
         resolver: zodResolver(videoSchema),
@@ -42,24 +44,21 @@ export const AddVideoBlock = ({  }: AddVideoBlockProps) => {
             description: "",
             actionFormId: "",
             actionUrl: "",
-            blocId: "cm46sjhud000110f5m8idrgd45",
+            blocId: blocId,
             duration: 0,
             videoFile: undefined,
             videoUrl: "",
             thumbnailFile: undefined,
             thumbnailUrl: ''
-
         },
     });
 
 
     const { formState: { errors }, watch } = form;
     const actionType = watch("actionType") || "URL";
-    console.log('Form errors:', errors);
 
 
     async function onSubmit(values: z.infer<typeof videoSchema>) {
-        console.log('Initial values:', values);
         setIsPending(true)
 
         try {
@@ -107,13 +106,15 @@ export const AddVideoBlock = ({  }: AddVideoBlockProps) => {
             if (res.success && res.data) {
                 toast({
                     title: "Success",
-                    description: "SubBloc ajouté avec succes"
+                    description: res.message
                 })
+                addSubBloc(res.data.blocId!, res.data)
+                setIsVideoUpload(false);  // Désactive l'état de chargement une fois l'envoi terminé
+                setIsthumnailUpload(false)
+                setIsPending(false)
+                setIsAddSousBloc(false)
             }
 
-            setIsVideoUpload(false);  // Désactive l'état de chargement une fois l'envoi terminé
-            setIsthumnailUpload(false)
-            setIsPending(false)
         } catch (error) {
             console.error('Error uploading files:', error);
             toast({
@@ -124,45 +125,6 @@ export const AddVideoBlock = ({  }: AddVideoBlockProps) => {
             setIsPending(false)
         }
     }
-
-
-    // async function onSubmit(values: z.infer<typeof videoSchema>) {
-    //     console.log('Initial values:', values);
-
-    //     try {
-    //         // Si la vidéo existe, téléchargez-la et mettez à jour l'URL
-    //         if (values.videoFile) {
-    //             setIsVideoUpload(true);
-    //             // Téléchargez la vidéo sur S3 et récupérez l'URL
-    //             const videoUrl = await uploadFileAws(values.videoFile, 'videos/');
-    //             values.videoUrl = videoUrl; // Affectez l'URL obtenue
-    //             setIsVideoUpload(false);
-    //         }
-
-    //         // Si la miniature existe, téléchargez-la et mettez à jour l'URL
-    //         if (values.thumbnailFile) {
-    //             setIsthumnailUpload(true);
-    //             // Téléchargez la miniature sur S3 et récupérez l'URL
-    //             const thumbnailUrl = await uploadFileAws(values.thumbnailFile, 'thumbnails/');
-    //             values.thumbnailUrl = thumbnailUrl; // Affectez l'URL obtenue
-    //             setIsthumnailUpload(false);
-    //         }
-
-    //         // Supprimez les objets File avant d'envoyer les valeurs au serveur
-    //         const { videoFile, thumbnailFile, ...cleanedValues } = values;
-
-    //         // Envoyez uniquement les valeurs nettoyées (les URLs, pas les objets File)
-    //         await mutateAsync(cleanedValues); // Assurez-vous d'envoyer les données nettoyées
-
-    //     } catch (error) {
-    //         console.error('Error uploading files:', error);
-    //         toast({
-    //             title: "Erreur",
-    //             description: "Une erreur est survenue lors de l'upload des fichiers."
-    //         });
-    //     }
-    // }
-
 
     return (
         <Card className="w-full  mx-auto">

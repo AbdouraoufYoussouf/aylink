@@ -5,9 +5,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ThemeToggle } from '@/components/theme/theme-toggle'
 
-export default function UserLinkSkeleton() {
+type Props = {
+  isPreview?: boolean
+}
+
+export default function UserLinkSkeleton({ isPreview }: Props) {
   return (
-    <div className="min-h-screen relative md:m-4 flex flex-col items-center">
+    <div className={`min-h-screen relative ${isPreview ? '' : "md:m-4"} flex flex-col items-center`}>
       <header className="absolute top-0 right-0 z-10 m-2">
         <ThemeToggle />
       </header>
@@ -15,7 +19,7 @@ export default function UserLinkSkeleton() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-lg border border-purple-950 sm:rounded-lg shadow-xl overflow-hidden"
+        className={`w-full max-w-lg ${isPreview ? "" : "border border-purple-950"} sm:rounded-lg shadow-xl overflow-hidden`}
       >
         <div className="relative h-40">
           <Skeleton className="bg-muted h-full w-full" />

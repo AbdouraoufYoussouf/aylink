@@ -47,6 +47,7 @@ model User {
   contacts    Contact[]    @relation("UserContacts")
   tags        Tag[]        @relation("UserTags")
   forms       Form[]
+  Asset       Asset[]
 }
 
 model Tag {
@@ -126,20 +127,23 @@ enum SubBlocType {
   URL
   IMAGE
   DOCUMENT
+  PRODUCT
   VIDEO
 }
 
 model Bloc {
-  id        String     @id @default(cuid())
+  id        String  @id @default(cuid())
   name      String
   userId    String
-  user      User       @relation(fields: [userId], references: [id])
-  subBlocks SubBlock[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime?  @updatedAt
+  isDisplay Boolean @default(true)
+
+  user      User      @relation(fields: [userId], references: [id])
+  subBlocs  SubBloc[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
-model SubBlock {
+model SubBloc {
   id          String      @id @default(cuid())
   type        SubBlocType
   title       String
@@ -159,6 +163,7 @@ model SubBlock {
   // Fields for IMAGE type
   imageUrl String?
   altText  String?
+  price    Decimal?
 
   // Fields for DOCUMENT type
   documentUrl String?
@@ -178,6 +183,20 @@ model SubBlock {
 enum VideoActionType {
   URL
   FORM
+}
+
+model Asset {
+  id        String   @id @default(cuid())
+  userId    String
+  fileName  String
+  fileType  String
+  fileSize  Int
+  s3Key     String
+  s3Url     String  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Account {

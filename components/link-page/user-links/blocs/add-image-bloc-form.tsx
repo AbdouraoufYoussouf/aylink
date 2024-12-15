@@ -38,12 +38,12 @@ const imageSchema = z.object({
 type ImageBlockFormData = z.infer<typeof imageSchema>
 
 interface AddImageBlockProps {
-    type: string
     blocId: string
-    onAddSousBloc: (blocId: string, sousBloc: any) => void
+    setIsAddSousBloc: (isAddSousBloc: boolean) => void
+
 }
 
-export function AddImageBlock({ type, blocId, onAddSousBloc }: AddImageBlockProps) {
+export function AddImageBlock({ setIsAddSousBloc,blocId }: AddImageBlockProps) {
     const [isCropping, setIsCropping] = useState(false)
     const [tempImageUrl, setTempImageUrl] = useState<string | null>(null)
 
@@ -61,7 +61,7 @@ export function AddImageBlock({ type, blocId, onAddSousBloc }: AddImageBlockProp
     })
 
     const onSubmit = (data: ImageBlockFormData) => {
-        onAddSousBloc(blocId, { ...data, type })
+        console.log('data:',data)
     }
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
