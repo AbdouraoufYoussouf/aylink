@@ -90,7 +90,7 @@ export const blocs: BlocType[] = [
                 id: "4",
                 type: "URL",
                 title: "Mon WhatsApp",
-                description: "Ecrivez moi ici si vous voulez l'abonnement IPTV.",
+                description: "Ecrivez moi ici si vous voulez l'application avec l'abonnement IPTV.",
                 url: "https://wa.me/33751536056",
                 imageUrl: "/whatsapp.webp",
                 isPrivate: false,

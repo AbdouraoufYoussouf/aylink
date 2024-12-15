@@ -55,7 +55,7 @@ export const BlocUrl = ({ subBloc, isAdmin }: Props) => {
     }
 
     return (
-        <Card className={`overflow-hidden border ${!isAdmin ? "hover:bg-muted" : ""} bg-background text-primary-foreground `}>
+        <Card className={`overflow-hidden border cursor-pointer ${!isAdmin ? "hover:bg-muted" : ""} bg-background text-primary-foreground `}>
             <CardContent className="p-0">
                 <div className='flex items-center mr-1.5'>
                     <div
