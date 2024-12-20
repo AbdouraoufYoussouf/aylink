@@ -66,6 +66,18 @@ export const blocs: BlocType[] = [
             {
                 id: "2",
                 type: "URL",
+                title: "Kraven the Hunter",
+                description: "Best film of the year.",
+            
+                url: "https://vvw.french-stream.bio/15119394-kraven-the-hunter.html",
+                imageUrl: "/kraven.webp",
+                isPrivate: true,
+                isDisplay: true,
+                isPaid: false
+            },
+            {
+                id: "2",
+                type: "URL",
                 title: "Red One",
                 description: "Best film avec The Rock et Captaine americain",
             
