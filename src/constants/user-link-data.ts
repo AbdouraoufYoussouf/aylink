@@ -4,28 +4,28 @@ import { UserProfilType } from "../types/user-type"
 
 export const profilData: UserProfilType = {
     id: "1",
-    pseudo: "Rafien",
-    description: "💻 Développeur et créateur de contenu, dans ce profil je vous aide à accéder aux meilleurs films 🎬, séries 📺 et événements sportifs ⚽. Consultez les liens ci-dessous.",
-    image: "/rafien.png",
+    pseudo: "AYFLIX-TV",
+    description: "AYFLIX-TV est un service IPTV premium offrant un accès illimité à des milliers de chaînes, films et séries  📺 et vos événements sportifs préférés ⚽ en HD ✨",
+    image: "/ayflixtv.png",
     banner: "/baniptv.png",
     socialLinks: [
         {
             icon: FaTiktok,
-            url: "https://www.tiktok.com/@rafien.fr",
+            url: "https://www.tiktok.com/@ayflixtv",
             color: "",
             id: "",
             name: "",
             isActive: false
         },
-        {
-            icon: FaYoutube,
-            url: "https://www.youtube.com/@storyscool",
-            color: "text-red-600",
-            id: "",
-            name: "",
-            isActive: false
-        },
-     
+        // {
+        //     icon: FaYoutube,
+        //     url: "https://www.youtube.com/@storyscool",
+        //     color: "text-red-600",
+        //     id: "",
+        //     name: "",
+        //     isActive: false
+        // },
+
         {
             name: 'GitHub',
             icon: FaGithub,
@@ -48,27 +48,81 @@ export const profilData: UserProfilType = {
 export const blocs: BlocType[] = [
     {
         id: "1",
+        name: "Abonnement IPTV",
+        products: [
+            {
+                id: "1",
+                name: "Starter Pack",
+                duration: "3 MOIS",
+                price: 29.99,
+                description: "Abonnement IPTV",
+                imageUrl: "/12mois.png",
+                title: "",
+                isDisplay: false,
+                type: "PRODUCT",
+                isPrivate: false,
+                isPaid: false,
+                currency: "EUR",
+                actionUrl:"https://www.ayflixtv.com/checkout/2"
+            },
+            {
+                id: "2",
+                name: "VIP Full Pack",
+                duration: "12 MOIS",
+                price: 52.99,
+                popular: true,
+                description: "Abonnement IPTV 12 mois",
+                imageUrl: "/12mois.png",
+                title: "",
+                isDisplay: false,
+                type: "PRODUCT",
+                isPrivate: false,
+                isPaid: false,
+                currency: "EUR",
+                actionUrl:"https://www.ayflixtv.com/checkout/2"
+            },
+            {
+                id: "3",
+                name: "Pack Smart+",
+                duration: "6 MOIS",
+                price: 39.99,
+                description: "Abonnement IPTV 6 mois",
+                imageUrl: "/12mois.png",
+                isDisplay: true,
+                isPrivate: false,
+                isPaid: false,
+                title: "",
+                type: "PRODUCT",
+                currency: "EUR",
+                actionUrl:"https://www.ayflixtv.com/checkout/1"
+            },
+        ],
+        subBlocs: [
+            {
+                id: "1", // ID unique requis
+                type: "VIDEO",
+                title: "Films, Series et footbal en illimité",
+                description: "Discover how to access your favorite series, movies, and live TV channels from around the world and enjoy your favorite content.", videoUrl: "/pub1.mp4",
+                thumbnailUrl: "/miniiptv1.jpg",
+                actionType: "URL",
+                actionFormId: "1",
+                actionUrl: "https://www.ayflixtv.com/",
+                isPrivate: true,
+                isDisplay: true,
+                isPaid: false
+            },
+        ]
+    },
+    {
+        id: "1",
         name: "Films et Séries",
         subBlocs: [
-            // {
-            //     id: "1", // ID unique requis
-            //     type: "VIDEO",
-            //     title: "Films, Series et footbal en illimité",
-            //     description: "Découvrez comment accéder à vos series,films et aux chaînes TV du monde entier en direct et profiter de vos contenus préférés.",
-            //     videoUrl: "/pub2.mp4",
-            //     thumbnailUrl: "/miniiptv.jpg",
-            //     actionType:"FORM",
-            //     actionFormId:"1",
-            //     isPrivate: true,
-            //     isDisplay: true,
-            //     isPaid: false
-            // },
             {
                 id: "2",
                 type: "URL",
                 title: "Kraven the Hunter",
                 description: "Best film of the year.",
-            
+
                 url: "https://vvw.french-stream.bio/15119394-kraven-the-hunter.html",
                 imageUrl: "/kraven.webp",
                 isPrivate: true,
@@ -80,7 +134,7 @@ export const blocs: BlocType[] = [
                 type: "URL",
                 title: "Red One",
                 description: "Best film avec The Rock et Captaine americain",
-            
+
                 url: "https://vvw.french-stream.bio/15119029-red-one.html",
                 imageUrl: "/redone.jpg",
                 isPrivate: true,

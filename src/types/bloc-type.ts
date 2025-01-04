@@ -23,13 +23,14 @@ export const urlSchema = baseSchema.extend({
 
 const productSchema = baseSchema.extend({
   type: z.literal(SubBlocType.PRODUCT),
-  productName: z.string().min(1, "Le nom du produit est obligatoire"),
+  name: z.string().min(1, "Le nom du produit est obligatoire"),
   price: z.number().min(0, "Le prix doit être positif ou nul"),
   currency: z.string().default("EUR"),
-  sku: z.string().optional(),
+  duration: z.string().optional(),
   stock: z.number().int().min(0, "Le stock doit être un nombre entier positif ou nul").optional(),
   imageFile: z.instanceof(File).optional(),
-  imageUrl: z.string().url("L'URL de l'image du produit doit être valide").optional(),
+  imageUrl: z.string().optional(),
+  popular: z.boolean().optional(),
   category: z.string().optional(),
   tags: z.array(z.string()).optional(),
   variants: z.array(z.object({
@@ -38,11 +39,13 @@ const productSchema = baseSchema.extend({
     sku: z.string().optional(),
     stock: z.number().int().min(0).optional(),
   })).optional(),
+  actionUrl: z.string().optional(),
   shortDescription: z.string().max(200, "La description courte ne doit pas dépasser 200 caractères").optional(),
   longDescription: z.string().optional(),
   specifications: z.record(z.string(), z.string()).optional(),
   relatedProducts: z.array(z.string()).optional(), // IDs of related products
 });
+
 const imageSchema = baseSchema.extend({
   type: z.literal(SubBlocType.IMAGE),
   imageFile: z.instanceof(File).optional(),
@@ -86,6 +89,7 @@ export const blocShema = z.object({
   isDisplay:z.boolean().optional(),
   name: z.string().min(1, "Le titre est obligatoire"),
   subBlocs: z.array(createSousBlocSchema).optional(),
+  products: z.array(productSchema).optional(),
 })
 export const updateBlocShema = z.object({
   blocId: z.string(),
@@ -99,6 +103,7 @@ export type VideoSubBlocType = z.infer<typeof videoSchema>
 export type UrlSubBlocType = z.infer<typeof urlSchema>
 export type ImageSubBlocType = z.infer<typeof imageSchema>
 export type DocumentSubBlocType = z.infer<typeof documentSchema>
+export type ProductSubBlocType = z.infer<typeof productSchema>
 
 export type BlocType = z.infer<typeof blocShema>
 export type CreateBlocType = z.infer<typeof createBlocShema>

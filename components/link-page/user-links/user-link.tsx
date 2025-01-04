@@ -12,6 +12,7 @@ import UserLinkSkeleton from './link-page-skeleton'
 import { BlocVideo } from './blocs/bloc-video'
 import { blocs, profilData } from '@/src/constants/user-link-data'
 import { BlocUrl } from './blocs/bloc-url'
+import { ProductBloc } from './blocs/product-bloc'
 
 type Props = {
   pseudo: string,
@@ -100,7 +101,7 @@ export default function UserLink({ pseudo, isPreview }: Props) {
               ))}
             </motion.div>
 
-            <div className="space-y-4">
+            <div className="space-y-10">
               {blocs.map((bloc, blocIndex) => (
                 <motion.div
                   key={blocIndex}
@@ -132,6 +133,11 @@ export default function UserLink({ pseudo, isPreview }: Props) {
                       )
                     }
                     )}
+                    {
+                      bloc.products && 
+                        <ProductBloc products={bloc.products}/>
+                      
+                    }
                   </div>
                 </motion.div>
               ))}
