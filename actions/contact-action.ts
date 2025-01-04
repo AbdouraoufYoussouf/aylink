@@ -341,15 +341,15 @@ export const deleteManyContactAction = action
     const tagName = "lioness";
   
     try {
-      // Récupérer l'utilisateur avec le pseudo 'rafien'
+      // Récupérer l'utilisateur avec le pseudo 'ayflixtv'
       const user = await db.user.findUnique({
-        where: { pseudo: "rafien" },
+        where: { pseudo: "ayflixtv" },
         include: { contacts: true }, // Inclure les contacts associés à cet utilisateur
       });
   
       if (!user) {
-        console.log("Utilisateur avec le pseudo 'rafien' introuvable.");
-        return { success: false, message: "Aucun utilisateur 'rafien' trouvé." };
+        console.log("Utilisateur avec le pseudo 'ayflixtv' introuvable.");
+        return { success: false, message: "Aucun utilisateur 'ayflixtv' trouvé." };
       }
   
       console.log(`Utilisateur trouvé : ${user.id} avec ${user.contacts.length} contacts.`);

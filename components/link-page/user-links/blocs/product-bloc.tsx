@@ -50,13 +50,13 @@ export const ProductBloc: React.FC<ProductBlocProps> = ({ products }) => {
                             key={index}
                             onClick={() => handleLinkClick(product.actionUrl)}
                             className={cn(
-                                "pl-2 md:pl-4",
+                                "pl-2 md:pl-4 ",
                                 index === current ? "w-full" : "w-2/3 md:w-1/2 lg:w-1/3",
                                 "transition-all duration-300 ease-in-out"
                             )}
                         >
                             <div className="relative w-full h-[200px]">
-                                <Card className="absolute inset-0 transform transition duration-500 hover:bg-muted overflow-hidden">
+                                <Card className="absolute shadow-2xl border-accent-foreground border-2 inset-0 transform transition duration-500 hover:bg-muted overflow-hidden">
                                     <CardContent className="p-0 relative w-full h-full">
                                         {product.imageUrl && (
                                             <Image
@@ -68,7 +68,7 @@ export const ProductBloc: React.FC<ProductBlocProps> = ({ products }) => {
                                             />
                                         )}
                                         {product.popular && (
-                                            <div className="absolute right-0 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold">
+                                            <div className="absolute right-0 bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-bold">
                                                 Populaire
                                             </div>
                                         )}

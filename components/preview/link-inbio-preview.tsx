@@ -9,7 +9,7 @@ interface LinkInBioPreviewProps {
 export const LinkInBioPreview: React.FC<LinkInBioPreviewProps> = ({ }) => {
   return (
     <div>
-      <UserLink isPreview pseudo='rafien' />
+      <UserLink isPreview pseudo='ayflixtv' />
     </div>
   )
 }

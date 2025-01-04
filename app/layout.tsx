@@ -19,7 +19,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Rafien",
+  title: "AYFLIX-TV",
   description: "Créateur de contenu et developeur web",
  
 };

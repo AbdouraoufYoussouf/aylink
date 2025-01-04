@@ -88,7 +88,7 @@ export const GetUserInfosIptv: React.FC<Props> = ({ isModalOpen, setIsModalOpen 
           : "Merci pour votre aide!";
 
         // Assemble the message with explicit line breaks
-        const message = `Bonjour Rafien,\n\n` +
+        const message = `Bonjour AyflixTv,\n\n` +
           `Je suis intéressé par l'abonnement IPTV. Voici mes coordonnées pour obtenir les codes :\n\n` +
           `${nameField ? `- ${nameField}\n` : ''}` +
           `${emailField ? `- ${emailField}\n` : ''}` +
