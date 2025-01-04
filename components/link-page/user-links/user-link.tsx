@@ -74,7 +74,7 @@ export default function UserLink({ pseudo, isPreview }: Props) {
         </div>
         <div className={`p-2 text-center mt-6 ${!isPreview ? "md:p-4  sm:mt-12" : ""}`}>
           <div className="">
-            <h1 className="text-xl font-bold ">{profilData.pseudo}</h1>
+            <h1 className="text-xl font-bold mb-3 ">{profilData.pseudo}</h1>
             <p className="text-sm text-muted-foreground leading-4 text-justify mb-4">{profilData.description}</p>
 
             <motion.div
