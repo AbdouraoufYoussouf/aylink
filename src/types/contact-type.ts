@@ -4,6 +4,8 @@ export interface ContactType {
     email: string,
     country?: string,
     location?: string,
+    createdAt?: Date,
+
 }
 
 export interface FilterContactParams {

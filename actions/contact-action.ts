@@ -343,9 +343,9 @@ export const deleteManyContactAction = action
     try {
       // Récupérer l'utilisateur avec le pseudo 'ayflixtv'
       const user = await db.user.findUnique({
-        where: { pseudo: "ayflixtv" },
+        where: { pseudo:"rafien" },
         include: { contacts: true }, // Inclure les contacts associés à cet utilisateur
-      });
+      } );
   
       if (!user) {
         console.log("Utilisateur avec le pseudo 'ayflixtv' introuvable.");

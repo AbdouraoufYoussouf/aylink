@@ -49,8 +49,8 @@ export default function UserLink({ pseudo, isPreview }: Props) {
         transition={{ duration: 0.5 }}
         className={`w-full max-w-lg ${!isPreview ? "sm:border md:m-4 sm:border-purple-950" : ""} sm:rounded-lg shadow-xl overflow-hidden`}
       >
-        <div className="relative h-40">
-          {
+        <div className="relative flex items-center justify-center mt-12">
+          {/* {
             profilData?.banner &&
             <Image
               src={profilData?.banner}
@@ -60,7 +60,7 @@ export default function UserLink({ pseudo, isPreview }: Props) {
               className=""
               width={1000} height={100}
             />
-          }
+          } */}
           {
             profilData?.image &&
             <Image
@@ -68,14 +68,15 @@ export default function UserLink({ pseudo, isPreview }: Props) {
               alt="Profile"
               width={112}
               height={112}
-              className={`w-20 h-20 ${!isPreview ? "sm:w-28 sm:h-28" : ""} rounded-full mx-auto mb-2 border-4 border-white absolute top-[6rem] left-1/2 shadow-lg  transform -translate-x-1/2`}
+              objectFit='contain'
+              className={`w-20 h-20 p-2 ${!isPreview ? "sm:w-28 sm:h-28" : ""} rounded-full mb-2 border border-white  shadow-lg  `}
             />
           }
         </div>
-        <div className={`p-2 text-center mt-6 ${!isPreview ? "md:p-4  sm:mt-12" : ""}`}>
+        <div className={`p-2 text-center mt-4 ${!isPreview ? "md:p-4  " : ""}`}>
           <div className="">
             <h1 className="text-xl font-bold mb-3 ">{profilData.pseudo}</h1>
-            <p className="text-sm text-muted-foreground leading-4 text-justify mb-4">{profilData.description}</p>
+            <p className="text-base p-2 text-muted-foreground leading-5 text-justify mb-4">{profilData.description}</p>
 
             <motion.div
               className="flex justify-center space-x-1 mb-4"
@@ -110,7 +111,7 @@ export default function UserLink({ pseudo, isPreview }: Props) {
                   transition={{ duration: 0.5, delay: blocIndex * 0.1 }}
                 >
                   <h2 className="text-lg font-semibold underline mb-2">{bloc.name}</h2>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {bloc.subBlocs && bloc.subBlocs.map((subBloc, subBlocIndex) => {
 
                       return (
@@ -136,7 +137,6 @@ export default function UserLink({ pseudo, isPreview }: Props) {
                     {
                       bloc.products && 
                         <ProductBloc products={bloc.products}/>
-                      
                     }
                   </div>
                 </motion.div>

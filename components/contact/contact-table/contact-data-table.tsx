@@ -55,6 +55,7 @@ export function ContactDataTable({
     const [lastScrollPosition, setLastScrollPosition] = useState(0)
 
     const [total, setTotal] = useState(0)
+    console.log('psseudo:',session?.user.pseudo)
 
     const { isLoading, data, refetch } = useQuery({
         queryKey: ['contacts', currentPage, searchTerm, tag],
