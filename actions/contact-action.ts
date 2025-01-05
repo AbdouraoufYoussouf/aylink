@@ -219,10 +219,15 @@ export const getAllContactFilterAction = async (filters: FilterContactParams): P
     const sanitizedPage = Math.max(1, page || 1); // Ensure page is at least 1
     const sanitizedPageSize = Math.min(100, Math.max(1, pageSize || 10)); // Ensure pageSize is between 1 and 100
 
+    const orderBy: Prisma.ContactOrderByWithRelationInput[] = [
+      { updatedAt: 'desc' },
+      { createdAt: 'desc' }
+  ];
     // Find user by pseudo
     const user = await db.user.findUnique({
       where: { pseudo },
       select: { id: true },
+      
     });
 
     if (!user) {
@@ -273,6 +278,7 @@ export const getAllContactFilterAction = async (filters: FilterContactParams): P
         where,
         skip,
         take,
+        orderBy
       }),
       db.contact.count({ where }),
     ]);
