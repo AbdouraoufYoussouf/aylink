@@ -69,7 +69,7 @@ export const blocs: BlocType[] = [
                 id: "2",
                 name: "VIP Full Pack",
                 duration: "12 MOIS",
-                price: 52.99,
+                price: 49.99,
                 popular: true,
                 description: "Abonnement IPTV",
                 imageUrl: "/12mois.png",
