@@ -63,7 +63,7 @@ export const blocs: BlocType[] = [
                 isPrivate: false,
                 isPaid: false,
                 currency: "EUR",
-                actionUrl:"https://www.ayflixtv.com/checkout/2"
+                actionUrl: "https://www.ayflixtv.com/checkout/2"
             },
             {
                 id: "2",
@@ -79,7 +79,7 @@ export const blocs: BlocType[] = [
                 isPrivate: false,
                 isPaid: false,
                 currency: "EUR",
-                actionUrl:"https://www.ayflixtv.com/checkout/2"
+                actionUrl: "https://www.ayflixtv.com/checkout/2"
             },
             {
                 id: "3",
@@ -94,7 +94,7 @@ export const blocs: BlocType[] = [
                 title: "",
                 type: "PRODUCT",
                 currency: "EUR",
-                actionUrl:"https://www.ayflixtv.com/checkout/1"
+                actionUrl: "https://www.ayflixtv.com/checkout/1"
             },
         ],
         subBlocs: [
@@ -102,8 +102,9 @@ export const blocs: BlocType[] = [
                 id: "1", // ID unique requis
                 type: "VIDEO",
                 title: "Films, Series et footbal en illimité",
-                description: "Discover how to access your favorite series, movies, and live TV channels from around the world and enjoy your favorite content.", videoUrl: "/pub1.mp4",
-                thumbnailUrl: "/miniiptv3.png",
+                description: "Discover how to access your favorite series, movies, and live TV channels from around the world and enjoy your favorite content.",
+                videoUrl: "/tunel.mp4",
+                thumbnailUrl: "/tunel.png",
                 actionType: "URL",
                 actionFormId: "1",
                 actionUrl: "https://www.ayflixtv.com/",
